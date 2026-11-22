@@ -1,18 +1,27 @@
+<p align="center">
+  <img src="assets/icono-registro-ventas.png" alt="Recibo de venta con una marca de validación" width="128" height="128">
+</p>
+
 # Registro de Ventas en Solana con tope por operación
 
 **Solana Engineering Track: Advanced · Ruta 2: proyecto guiado con mejora funcional**
 
 Registro de negocio, clientes y ventas mediante una aplicación web con wallet y un programa Rust/Anchor en Solana Devnet. El aporte propuesto evita que una captura por encima del límite definido por el negocio se guarde como venta o como corrección de importe.
 
-**Estado de este repositorio:** documentación inicial. Integración del proyecto guiado, implementación, despliegue, pruebas y demo pendientes.
+**Estado:** alcance definido, iconos incorporados al repositorio y primeros cambios de Rust y frontend preparados como parches. Integración del cierre guiado, compilación, pruebas en Devnet y demo pendientes.
 
 ## Punto de partida
 
-La base será el cierre de las cinco sesiones de Registro de Ventas de WayLearn, incluido el flujo de baja condicionada de clientes del día 5. Una vez importada, registrar aquí la **URL, rama o etiqueta y SHA del commit de origen**. El [directorio de recursos de WayLearn](https://waylearn.gitbook.io/solana-engineering-track-advanced/recursos/enlaces-y-grabaciones) enlaza un repositorio en la sesión 1. Verificar qué versión reúne el frontend, el cliente y la baja del día 5 antes de fijar el punto de partida.
+| Componente | Referencia de trabajo |
+| --- | --- |
+| Programa Rust/Anchor | [WayLearnLatam/Registro-Ventas-Solana-PDA, commit `1a414a8`](https://github.com/WayLearnLatam/Registro-Ventas-Solana-PDA/tree/1a414a889446934723d0c998a0a1977e79087dcb) |
+| Frontend React/TypeScript | [WayLearnLatam/Registro-Ventas-Solana-App, commit `baee514`](https://github.com/WayLearnLatam/Registro-Ventas-Solana-App/tree/baee5142f050e8fb92ccd4f910fe2cda44610e00) |
+
+Las referencias publicadas incluyen cinco operaciones. El flujo de baja condicionada de clientes del día 5 debe integrarse para completar la base de WayLearn. Consultar [Pruebas y evidencias](https://waylearn.gitbook.io/solana-engineering-track-advanced/pruebas-y-evidencias) para sus precondiciones.
 
 ## Aporte propio
 
-Agregar un límite fijo e inclusivo de **10 000 unidades monetarias** por venta. Si el monto supera el límite al registrar una venta o corregir una existente, el programa devuelve un error de negocio. El importe del formulario y el entero enviado al programa deben representar el mismo valor. Antes de implementar, confirmar si la versión base usa unidades enteras o unidades menores y definir la constante Rust en esa misma escala.
+Agregar un límite fijo e inclusivo de **10 000 unidades** por venta. Si el monto supera el límite al registrar una venta o corregir una existente, el programa devuelve un error de negocio. La base representa los importes como enteros `u32`, así que `10_000` en Rust corresponde a 10 000 en el formulario.
 
 | Capa | Trabajo previsto |
 | --- | --- |
@@ -21,6 +30,13 @@ Agregar un límite fijo e inclusivo de **10 000 unidades monetarias** por venta.
 | Frontend | Mostrar el tope en los formularios y traducir el rechazo del programa a «El importe supera el máximo permitido de 10 000». Tras una operación confirmada, volver a consultar los datos y mostrar el enlace de la transacción. |
 
 ## Configuración y ejecución
+
+### Integración del avance
+
+- En la raíz de la copia del programa, aplicar [programa-tope.patch](patches/programa-tope.patch). El parche agrega la regla a `registrar_venta` y `cambiar_monto`.
+- En la raíz de la copia del frontend, aplicar [frontend-tope-e-icono.patch](patches/frontend-tope-e-icono.patch) y copiar [favicon.png](app/public/favicon.png) a `public/favicon.png`. El formulario informa el límite y deja que el programa devuelva el rechazo. El manejador de errores de la base consulta el IDL para traducir errores personalizados.
+- Aplicar cada parche con `git apply /ruta/al/parche.patch` desde la copia correspondiente. Si el cierre del día 5 usa otra revisión, verificar compatibilidad con `git apply --check /ruta/al/parche.patch`.
+- El frontend de referencia documenta Node.js 22.12 o superior de la rama 22, `npm ci`, `npm run cliente` y `npm run dev`. Tras exportar el IDL del despliegue, el comando de importación es `npm run configurar:idl -- ./tmp-idl/registro.json`. Verificar estos pasos sobre la versión integrada.
 
 Completar esta sección con los datos de la versión base y verificarla desde un clon limpio.
 
@@ -32,7 +48,7 @@ Completar esta sección con los datos de la versión base y verificarla desde un
 
 ## Pruebas del aporte
 
-Usar clientes ficticios, una wallet autorizada y cuentas válidas. Ejemplos expresados en la misma escala visible que el formulario. Para el valor inmediatamente superior al tope, usar la unidad mínima que acepte el programa.
+Usar clientes ficticios, una wallet autorizada y cuentas válidas. El primer importe entero por encima del tope es **10 001**.
 
 | Caso | Operación | Resultado esperado | Resultado observado |
 | --- | --- | --- | --- |
@@ -65,14 +81,19 @@ Al ejecutar cada caso, anotar el estado inicial, el resultado observado, cómo s
 - **Transacción confirmada:** pendiente. Formato de enlace `https://explorer.solana.com/tx/<FIRMA>?cluster=devnet`.
 - **Video (60–90 s):** pendiente. Guion sugerido para 75 s: conectar wallet y mostrar el cliente (15 s), firmar y confirmar una venta válida (25 s), intentar una corrección superior al tope y mostrar el importe anterior (25 s), abrir la venta confirmada en Explorer (10 s). Si la interfaz filtra el importe antes de llamar al programa, mostrar también el error capturado por el cliente TypeScript.
 
-## Plan hacia la entrega
+## Avance de la semana del 16 al 22 de noviembre
 
-| Fecha (CDMX) | Resultado |
-| --- | --- |
-| Jueves 19 de noviembre | Identificar el cierre guiado, fijar su commit y arrancar el flujo base. |
-| Viernes 20 de noviembre | Implementar el tope en Rust, regenerar IDL y cliente e integrar los formularios. |
-| Sábado 21 de noviembre | Desplegar en Devnet y ejecutar las pruebas guiadas y las del aporte. |
-| Domingo 22 de noviembre | Verificar el README desde un clon limpio, grabar la demo y entregar antes de las 23:59 CDMX. |
+El lunes 16 es el inicio de referencia para organizar el trabajo. Los estados indican lo comprobado al preparar este avance.
+
+| Fecha (CDMX) | Objetivo | Estado actual |
+| --- | --- | --- |
+| Lunes 16 | Definir la Ruta 2, el límite y los casos que demuestran el aporte. | Listo |
+| Martes 17 | Identificar y fijar las versiones de Rust y frontend. | Referencias fijadas. Cierre del día 5 por integrar |
+| Miércoles 18 | Preparar el README, el icono del proyecto y el favicon. | Listo |
+| Jueves 19 | Preparar la regla Rust, el aviso en el formulario y el enlace al favicon. | Parches preparados |
+| Viernes 20 | Integrar la baja guiada, compilar el programa y sincronizar IDL y cliente. | Pendiente |
+| Sábado 21 | Desplegar en Devnet y ejecutar los casos válidos y de rechazo. | Pendiente |
+| Domingo 22 | Verificar el README, grabar la demo y entregar antes de las 23:59 CDMX. | Pendiente |
 
 La fecha del **30 de noviembre a las 23:59 CDMX** corresponde a correcciones solicitadas sobre proyectos enviados en el plazo inicial.
 

@@ -1,0 +1,45 @@
+diff --git a/src/lib.rs b/src/lib.rs
+index 9671e5b..96c71f8 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -2,6 +2,13 @@ use anchor_lang::prelude::*;
+ 
+ declare_id!("");
+ 
++const TOPE_POR_VENTA: u32 = 10_000;
++
++fn validar_tope(monto: u32) -> Result<()> {
++    require!(monto <= TOPE_POR_VENTA, Errores::MontoExcedeTope);
++    Ok(())
++}
++
+ #[program]
+ pub mod registro {
+     use super::*; // Importa todos los structs y enums definidos fuera del modulo
+@@ -57,6 +64,8 @@ pub mod registro {
+         descripcion: String,
+         monto: u32,
+     ) -> Result<()> {
++        validar_tope(monto)?;
++
+         context.accounts.venta.set_inner(Venta {
+             sku,
+             descripcion,
+@@ -115,6 +124,8 @@ pub mod registro {
+         sku: String,
+         nuevo_monto: u32,
+     ) -> Result<()> {
++        validar_tope(nuevo_monto)?;
++
+         let venta = &mut context.accounts.venta;
+         let viejo_monto = venta.monto;
+         venta.monto = nuevo_monto;
+@@ -137,6 +148,8 @@ pub enum Errores {
+     NoOwner,
+     #[msg("Error, la venta no esta en el historial del cliente")]
+     NoSKU,
++    #[msg("El importe supera el máximo permitido de 10 000 unidades.")]
++    MontoExcedeTope,
+ }
+ 
+ /////////////////////////// CUENTAS ///////////////////////////
