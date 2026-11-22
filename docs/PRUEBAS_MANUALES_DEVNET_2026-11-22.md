@@ -56,7 +56,7 @@ Tras actualizar `app/src/devnet.ts` y recargar la aplicación, **M02–M08** ava
 
 ## Trazabilidad y límites de evidencia
 
-Las capturas de pantalla del recorrido manual fueron proporcionadas en la conversación de revisión del proyecto. **No se adjuntan archivos de captura a este documento**; por tanto, la tabla anterior es una transcripción de los resultados visualmente observados, no un archivo de imágenes versionado.
+Las capturas del recorrido manual fueron aportadas en la conversación de revisión del proyecto y posteriormente **recortadas e incorporadas al repositorio como archivos PNG versionados**. Este documento incluye las imágenes en el [Anexo visual](#anexo-visual-capturas-de-las-pruebas-manuales), con sus rutas individuales en [`evidencias/capturas-manuales/`](../evidencias/capturas-manuales/ANEXO_CAPTURAS.md). Los recortes preservan la operación y el resultado observable, sin alterar el contenido probatorio.
 
 Para una evidencia transaccional **reproducible y versionada**, consultar:
 
