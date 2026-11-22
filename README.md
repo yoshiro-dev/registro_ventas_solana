@@ -16,10 +16,10 @@ Abrir **[Demo_local.html](Demo_local.html)** con Edge o Chrome. La práctica fun
 
 | Pieza | Archivos | Verificación |
 | --- | --- | --- |
-| Programa | `Anchor.toml`, `Cargo.toml`, [programa/src/lib.rs](programa/src/lib.rs) y manifiesto del crate | Siete instrucciones, firmas, PDA, cierres y validación de importes implementados. Compilación SBF pendiente en un equipo con la herramienta instalada |
-| App | `app/src/main.tsx`, `panel.mjs`, `style.css` y `devnet.ts` | React monta la interfaz. El cliente TypeScript deriva direcciones, construye instrucciones con Anchor, pide firma y relee cuentas después de confirmar. Build con dependencias y recorrido con una wallet pendientes |
-| Contrato | `app/src/idl.json` | IDL de referencia preparado desde el fuente. Sustituir por el IDL emitido por Anchor después de compilar |
-| Pruebas | `tests/`, pruebas unitarias en Rust y `scripts/verificar-red.mjs` | Cuatro pruebas Node ejecutadas. La comprobación de red usa dos wallets, valida rechazos y escribe evidencia de transacciones confirmadas |
+| Programa | `Anchor.toml`, `Cargo.toml`, [programa/src/lib.rs](programa/src/lib.rs) y manifiesto del crate | Siete instrucciones, firmas, PDA, cierres y validación de importes implementados. Compilación SBF verificada en GitHub Actions con Anchor 0.31.1 y Solana 2.1.0; binario generado |
+| App | `app/src/main.tsx`, `panel.mjs`, `style.css` y `devnet.ts` | React monta la interfaz. El cliente TypeScript deriva direcciones, construye instrucciones con Anchor, pide firma y relee cuentas después de confirmar. Instalación npm, TypeScript y build de React verificados; recorrido con wallet en Devnet pendiente |
+| Contrato | `app/src/idl.json` | IDL generado realmente por Anchor y sincronizado con el frontend; la dirección fuente sigue siendo de desarrollo, sin despliegue de Devnet |
+| Pruebas | `tests/`, pruebas unitarias en Rust y `scripts/verificar-red.mjs` | Tres pruebas Rust y cuatro pruebas Node aprobadas en CI. La comprobación de Devnet usa dos wallets y generará evidencia al ejecutarse después del despliegue |
 | Práctica local | `app/src/local.mjs` y `Demo_local.html` | Modelo en el navegador. Las transacciones y firmas para la certificación se obtienen en Devnet |
 
 **Metodología individual.** Cada hito tiene una operación reproducible, un resultado esperado y un estado observado. Se registra el cambio en Git y se documenta la prueba con su entorno. La matriz de evidencias distingue la práctica local de la ejecución del programa desplegado.
@@ -32,6 +32,19 @@ Abrir **[Demo_local.html](Demo_local.html)** con Edge o Chrome. La práctica fun
 | Frontend React/TypeScript | [WayLearnLatam/Registro-Ventas-Solana-App, commit `baee514`](https://github.com/WayLearnLatam/Registro-Ventas-Solana-App/tree/baee5142f050e8fb92ccd4f910fe2cda44610e00) |
 
 Las referencias publicadas incluyen cinco operaciones. El flujo de baja condicionada de clientes del día 5 está implementado en el programa y en la interfaz. Consultar [Pruebas y evidencias](https://waylearn.gitbook.io/solana-engineering-track-advanced/pruebas-y-evidencias) para sus precondiciones.
+
+## Evidencia técnica de compilación (21 de noviembre)
+
+La [ejecución exitosa de GitHub Actions](https://github.com/yoshiro-dev/registro_ventas_solana/actions/runs/44987227343) generó un binario SBF (`target/deploy/registro.so`) y el IDL real (`target/idl/registro.json`), verificando que ambos archivos existen. Con este IDL actualizado se ejecutaron correctamente:
+
+- `cargo test -p registro --lib`: **3 aprobadas, 0 fallidas** (pruebas de Rust).
+- `npm test`: **4 aprobadas, 0 fallidas** (modelo local y estructura de IDL).
+- `npm run build`: **correcto**, TypeScript y bundle Vite/React.
+- `npm install`: **correcto** en el runner de GitHub.
+
+[Artefactos de compilación y frontend](https://github.com/yoshiro-dev/registro_ventas_solana/actions/runs/44987227343#artifacts), conservados temporalmente por GitHub Actions. El IDL real está versionado en `app/src/idl.json`, junto con `Cargo.lock` y `package-lock.json` para facilitar una construcción reproducible.
+
+**No equivale a desplegar en Devnet:** el Program ID declarado en el IDL se usa como referencia de desarrollo y aún no ha sido corroborado como programa ejecutable. Las pruebas en la blockchain y la transacción de Explorer permanecen pendientes. El script `scripts/verificar-red.mjs` prepara las pruebas reales y guardará evidencia solo cuando se ejecute con dos wallets de prueba después del despliegue.
 
 ## Aporte propio
 
@@ -114,7 +127,7 @@ Al ejecutar cada caso, anotar el estado inicial, el resultado observado, cómo s
 ## Devnet y demo
 
 - **Program ID de Devnet:** pendiente de despliegue.
-- **Versión entregada:** pendiente de identificar con el SHA del commit.
+- **Versión compilada y validada en CI:** `a7f364f296e86318e7296db57dcbae2ab5d9b5fb` (código de la ejecución); IDL y lockfiles sincronizados en `6c3e183366ba90f7fec719b54d2aa769f0ddf451`. Versión de Devnet pendiente.
 - **Transacción confirmada:** pendiente. Formato de enlace `https://explorer.solana.com/tx/<FIRMA>?cluster=devnet`.
 - **Video (60–90 s):** pendiente. Guion sugerido para 75 s: conectar wallet y mostrar el cliente (15 s), firmar y confirmar una venta válida (25 s), intentar una corrección superior al tope y mostrar el importe anterior (25 s), abrir la venta confirmada en Explorer (10 s). Si la interfaz filtra el importe antes de llamar al programa, mostrar también el error capturado por el cliente TypeScript.
 
@@ -128,7 +141,7 @@ El plan empieza el lunes. Los primeros commits reales son del jueves 19. Los hit
 | Martes 17 | Especificar tres instrucciones afectadas: configurar, registrar y corregir. Definir límite inicial, límite inclusivo y comportamiento de ventas existentes. | Contrato descrito en Aporte propio y escenarios B01–B05. Documentación retrospectiva. |
 | Miércoles 18 | Diseñar las pruebas de frontera, aislamiento entre dos negocios y cierre condicionado de cliente. | Matrices A y B y pruebas del flujo guiado. Resultados en Devnet pendientes. |
 | Jueves 19 | Incorporar el campo persistido, la instrucción firmada de configuración, las dos validaciones de importe y la baja que retira la referencia y cierra Cliente. | Fuente Rust y dos pruebas unitarias escritas. Compilación y ejecución pendientes. |
-| Viernes 20 | Compilar y conectar Rust → IDL → cliente TypeScript → formularios de configuración, ventas y baja. | Cerrar con compilación, generación de cliente, lectura del límite desde la app y verificación del frontend. Pendiente. |
+| Viernes 20 | Compilar y conectar Rust → IDL → cliente TypeScript → formularios de configuración, ventas y baja. | Compilación SBF, IDL generado y sincronizado, pruebas y build de React confirmados en GitHub Actions el 21 de noviembre, sin prueba de interacción con wallet. |
 | Sábado 21 | Ejecutar el flujo completo contra el despliegue de Devnet y comprobar estado antes y después de cada rechazo. | Program ID, firma exitosa, errores del programa y lecturas de cuentas en tablas A y B. Pendiente. |
 | Domingo 22 | Reproducir desde clon limpio, grabar demo de 60–90 segundos y entregar antes de las 23:59 CDMX. | Video, acceso de revisión y envío pendientes. |
 
