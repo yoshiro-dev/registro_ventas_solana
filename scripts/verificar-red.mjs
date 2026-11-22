@@ -25,7 +25,7 @@ const clienteB=pda(Buffer.from('cliente'),segundo.toBuffer(),Buffer.from([1,0]))
 const ventaPda=(sku)=>pda(Buffer.from('venta'),cliente.toBuffer(),Buffer.from(sku));
 const sku='SSD01',venta=ventaPda(sku), anterior=ventaPda('ANT80'), exacta=ventaPda('L5000');
 const cs={...base,cliente}, vs={...cs,venta}, vsAnterior={...cs,venta:anterior}, vsExacta={...cs,venta:exacta};
-const evidence={programId:a.programId.toBase58(),negocio:name,cluster:'devnet',casos:[],ejecucion:'real'};
+const evidence={programId:a.programId.toBase58(),negocio:name,cluster:'devnet',casos:[],ejecucion:'real',estado:'en_progreso',walletA:owner.toBase58(),walletB:other.toBase58()};
 mkdirSync('evidencias',{recursive:true});
 const path='evidencias/'+name+'.json';
 const record=(row)=>{evidence.casos.push(row);writeFileSync(path,JSON.stringify(evidence,null,2));};
@@ -46,6 +46,8 @@ await send('Crear negocio B',b.methods.crearRegistro(name).accountsStrict({owner
 await send('Crear cliente',m.crearCliente('Ana').accountsStrict({...cs,systemProgram}));
 await send('Crear otro cliente',m.crearCliente('Luis').accountsStrict({...base,cliente:cliente2,systemProgram}));
 await send('Crear cliente B',b.methods.crearCliente('Bea').accountsStrict({owner:other,registro:segundo,cliente:clienteB,systemProgram}));
+assert.equal((await a.account.registro.fetch(registro)).topePorVenta,10000);
+assert.equal((await b.account.registro.fetch(segundo)).topePorVenta,10000);
 await send('Venta en límite inicial de 10000',m.registrarVenta(1,sku,'Disco SSD',10000).accountsStrict({...vs,systemProgram}));
 await send('Venta histórica por 8000',m.registrarVenta(1,'ANT80','Venta anterior',8000).accountsStrict({...vsAnterior,systemProgram}));
 await send('Cambiar límite A a 5000',m.configurarTope(5000).accountsStrict(base));
@@ -54,7 +56,9 @@ assert.equal((await b.account.registro.fetch(segundo)).topePorVenta,10000);
 assert.equal((await a.account.venta.fetch(venta)).monto,10000);
 assert.equal((await a.account.venta.fetch(anterior)).monto,8000);
 record({caso:'B01 conservar ventas antiguas y aislar límites',resultado:'A=5000, B=10000; ventas previas=10000 y 8000'});
-await send('Negocio B admite 5001',b.methods.registrarVenta(1,'B5001','Venta B',5001).accountsStrict({owner:other,registro:segundo,cliente:clienteB,venta:pda(Buffer.from('venta'),clienteB.toBuffer(),Buffer.from('B5001')),systemProgram}));
+const ventaB=pda(Buffer.from('venta'),clienteB.toBuffer(),Buffer.from('B5001'));
+await send('Negocio B admite 5001',b.methods.registrarVenta(1,'B5001','Venta B',5001).accountsStrict({owner:other,registro:segundo,cliente:clienteB,venta:ventaB,systemProgram}));
+assert.equal((await b.account.venta.fetch(ventaB)).monto,5001);
 await send('Alta en frontera 5000 en A',m.registrarVenta(1,'L5000','Venta límite',5000).accountsStrict({...vsExacta,systemProgram}));
 assert.equal((await a.account.venta.fetch(exacta)).monto,5000);
 await reject('Corrección 5000 a 5001 se rechaza',m.cambiarMonto(1,'L5000',5001).accountsStrict(vsExacta),'MontoExcedeTope');
@@ -66,7 +70,7 @@ assert.equal((await a.account.registro.fetch(registro)).topePorVenta,5000);
 const nueva=ventaPda('RAM01');
 await reject('Alta sobre tope',m.registrarVenta(1,'RAM01','Memoria',5001).accountsStrict({...cs,venta:nueva,systemProgram}),'MontoExcedeTope');
 assert.equal(await conn.getAccountInfo(nueva),null);
-assert.equal((await a.account.cliente.fetch(cliente)).compras,1);
+assert.equal((await a.account.cliente.fetch(cliente)).compras,3); // SSD01, ANT80 y L5000 siguen activas.
 await reject('Corrección sobre tope',m.cambiarMonto(1,sku,5001).accountsStrict(vs),'MontoExcedeTope');
 assert.equal((await a.account.venta.fetch(venta)).monto,10000);
 await reject('Venta ajena',m.cambiarMonto(2,sku,5000).accountsStrict({...vs,cliente:cliente2}),'ConstraintSeeds');
@@ -84,4 +88,28 @@ await send('Baja de cliente vacío',m.darBajaCliente(1).accountsStrict(cs));
 assert.equal(await conn.getAccountInfo(cliente),null);
 const final=await a.account.registro.fetch(registro);
 assert.equal(final.idCounter,2);assert.ok(!final.clientes.some(k=>k.equals(cliente)));
-record({caso:'Comprobación final',resultado:'Cuentas verificadas con dos negocios y dos wallets; bajas, rechazos y aislamiento comprobados'});console.log(path);
+record({caso:'Comprobación final',resultado:'Cuentas verificadas con dos negocios y dos wallets; bajas, rechazos y aislamiento comprobados'});
+evidence.estado='completada';
+evidence.finalizadoEn=new Date().toISOString();
+writeFileSync(path,JSON.stringify(evidence,null,2)+'\\n');
+const completed=evidence.casos.filter(x=>x.firma).length;
+const rejections=evidence.casos.filter(x=>x.error).length;
+const reportPath='evidencias/'+name+'.md';
+writeFileSync(reportPath,[
+  '# Evidencia de ejecución real en Solana Devnet',
+  '',
+  '- Programa: \`'+evidence.programId+'\`',
+  '- Negocio de prueba: '+name,
+  '- Wallet A: \`'+evidence.walletA+'\`',
+  '- Wallet B: \`'+evidence.walletB+'\`',
+  '- Estado: **completada**',
+  '- Operaciones confirmadas: '+completed,
+  '- Simulaciones rechazadas correctamente: '+rejections,
+  '',
+  '| Caso | Evidencia observada |',
+  '| --- | --- |',
+  ...evidence.casos.map(x=>'| '+x.caso+' | '+(x.url?'[Firma confirmada]('+x.url+')':x.error?'Rechazo \`'+x.error+'\`':x.resultado)+' |'),
+  ''
+].join('\\n'));
+console.log('Pruebas completas. Evidencia JSON: '+path);
+console.log('Informe con enlaces a Explorer: '+reportPath);
