@@ -16,8 +16,20 @@ export async function connectDevnet() {
   if (!wallet) throw Error('Instala o habilita una wallet Solana compatible en este navegador.');
   await wallet.connect();
   const owner = new PublicKey(wallet.publicKey.toBytes());
-  const connection = new Connection(clusterApiUrl('devnet'),'confirmed');
-  const provider = new AnchorProvider(connection,wallet,{commitment:'confirmed',preflightCommitment:'confirmed'});
+  // En un RPC público con balanceo de carga, un nodo puede simular en un slot
+  // anterior al blockhash obtenido de otro nodo y devolver "Blockhash not found".
+  // El blockhash y el preflight deben usar el mismo compromiso. "finalized"
+  // reduce las discrepancias entre nodos, a cambio de menos tiempo para firmar.
+  const customRpc = import.meta.env.VITE_SOLANA_RPC_URL?.trim();
+  if (customRpc && !/^https:\/\//.test(customRpc)) {
+    throw Error('VITE_SOLANA_RPC_URL debe ser una URL HTTPS de un RPC Solana Devnet.');
+  }
+  const connection = new Connection(customRpc || clusterApiUrl('devnet'),'finalized');
+  const provider = new AnchorProvider(connection,wallet,{
+    commitment:'confirmed',
+    preflightCommitment:'finalized',
+    maxRetries:5
+  });
   const program = new Program(idl as Idl,provider);
   const account = await connection.getAccountInfo(program.programId);
   if (!account?.executable) throw Error('El Program ID del IDL todavía no corresponde a un programa ejecutable en Devnet.');
