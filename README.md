@@ -17,9 +17,9 @@ Abrir **[Demo_local.html](Demo_local.html)** con Edge o Chrome. La práctica fun
 | Pieza | Archivos | Verificación |
 | --- | --- | --- |
 | Programa | `Anchor.toml`, `Cargo.toml`, [programa/src/lib.rs](programa/src/lib.rs) y manifiesto del crate | Siete instrucciones, firmas, PDA, cierres y validación de importes implementados. Compilación SBF verificada en GitHub Actions con Anchor 0.31.1 y Solana 2.1.0; binario generado |
-| App | `app/src/main.tsx`, `panel.mjs`, `style.css` y `devnet.ts` | React monta la interfaz. El cliente TypeScript deriva direcciones, construye instrucciones con Anchor, pide firma y relee cuentas después de confirmar. Instalación npm, TypeScript y build de React verificados; recorrido con wallet en Devnet pendiente |
-| Contrato | `app/src/idl.json` | IDL generado realmente por Anchor y sincronizado con el frontend; la dirección fuente sigue siendo de desarrollo, sin despliegue de Devnet |
-| Pruebas | `tests/`, pruebas unitarias en Rust y `scripts/verificar-red.mjs` | Tres pruebas Rust y cuatro pruebas Node aprobadas en CI. La comprobación de Devnet usa dos wallets y generará evidencia al ejecutarse después del despliegue |
+| App | `app/src/main.tsx`, `panel.mjs`, `style.css` y `devnet.ts` | React monta la interfaz. El cliente TypeScript deriva direcciones, construye instrucciones con Anchor, pide firma y relee cuentas después de confirmar. Instalación, TypeScript y build verificados; recorrido real con Phantom en Devnet completado y documentado en `docs/PRUEBAS_MANUALES_DEVNET_2026-11-22.md` |
+| Contrato | `app/src/idl.json` | IDL generado por Anchor y sincronizado; Program ID desplegado y ejecutable en Devnet: `7qUUv2DpK2puFn91gkjwyfRyEDhcJV3enMEBi6oMHG3z` |
+| Pruebas | `tests/`, pruebas unitarias en Rust y `scripts/verificar-red.mjs` | Tres pruebas Rust y cuatro Node aprobadas en CI; prueba real de dos wallets terminada con 15 firmas confirmadas y 7 rechazos esperados (archivos en `evidencias/`) |
 | Práctica local | `app/src/local.mjs` y `Demo_local.html` | Modelo en el navegador. Las transacciones y firmas para la certificación se obtienen en Devnet |
 
 **Metodología individual.** Cada hito tiene una operación reproducible, un resultado esperado y un estado observado. Se registra el cambio en Git y se documenta la prueba con su entorno. La matriz de evidencias distingue la práctica local de la ejecución del programa desplegado.
@@ -44,13 +44,13 @@ La [ejecución exitosa de GitHub Actions](https://github.com/yoshiro-dev/registr
 
 [Artefactos de compilación y frontend](https://github.com/yoshiro-dev/registro_ventas_solana/actions/runs/44987227343#artifacts), conservados temporalmente por GitHub Actions. El IDL real está versionado en `app/src/idl.json`, junto con `Cargo.lock` y `package-lock.json` para facilitar una construcción reproducible.
 
-**No equivale a desplegar en Devnet:** el Program ID declarado en el IDL se usa como referencia de desarrollo y aún no ha sido corroborado como programa ejecutable. Las pruebas en la blockchain y la transacción de Explorer permanecen pendientes. El script `scripts/verificar-red.mjs` prepara las pruebas reales y guardará evidencia solo cuando se ejecute con dos wallets de prueba después del despliegue.
+**Actualización del 22 de noviembre:** el bloque anterior describe la compilación previa al despliegue. Desde entonces, el programa fue desplegado y validado en Devnet, y la interfaz React operó con Phantom. Ver [despliegue verificado](#despliegue-verificado-en-solana-devnet) y [pruebas manuales](docs/PRUEBAS_MANUALES_DEVNET_2026-11-22.md).
 
 ## Aporte propio
 
 Cada negocio empieza con un tope de **10 000 unidades**. Su propietario puede modificarlo mediante `configurar_tope`. El programa exige la firma de la autoridad y un valor positivo. Las altas y correcciones leen el tope vigente desde la cuenta Registro. Cambiarlo afecta escrituras futuras y conserva el importe de las ventas existentes. Las devoluciones siguen disponibles.
 
-El nuevo campo ocupa cuatro bytes. El despliegue de esta práctica utilizará un Program ID nuevo y registros nuevos. Una actualización de un despliegue anterior requeriría migrar las cuentas. La baja condicionada de clientes pertenece a la base guiada.
+El nuevo campo ocupa cuatro bytes. El despliegue se realizó con un Program ID nuevo y registros nuevos. Una actualización de un despliegue anterior requeriría migrar las cuentas. La baja condicionada de clientes pertenece a la base guiada.
 
 ## Desarrollar y ejecutar
 
@@ -82,7 +82,7 @@ npm run build
 npm run dev
 ```
 
-`preparar` crea la clave de programa en `target/deploy/registro-keypair.json` si hace falta y sincroniza la dirección pública en Rust y Anchor.toml. Al finalizar `anchor build`, `npm run idl` copia el contrato generado a la app. La dirección inicial incluida en los fuentes es de desarrollo. Registrar el Program ID **efectivamente desplegado** y verificarlo en Explorer. Tras cualquier cambio del programa, recompilar y sincronizar el IDL antes de probar la app.
+`preparar` crea la clave de programa en `target/deploy/registro-keypair.json` si hace falta y sincroniza la dirección pública en Rust y Anchor.toml. Al finalizar `anchor build`, `npm run idl` copia el contrato generado a la app. La dirección actualmente versionada corresponde al programa **efectivamente desplegado** y está verificada en Explorer. Tras cualquier cambio del programa, recompilar y sincronizar el IDL antes de probar la app.
 
 ### Desplegar y verificar desde WSL con un solo comando
 
@@ -131,21 +131,21 @@ Si el formulario bloquea un importe antes de enviarlo, reproducir A03 y A05 con 
 
 | Caso | Comprobación esperada | Resultado observado |
 | --- | --- | --- |
-| Crear Registro y Cliente | Las cuentas y su relación se pueden consultar en la app | Pendiente |
-| Registrar y corregir una venta | Reproducir A01 y A04 con la wallet autorizada | Pendiente |
-| Procesar una devolución válida | La cuenta Venta se cierra y se actualiza Cliente | Pendiente |
-| Dar de baja a un cliente sin ventas | Se cierra su cuenta, se retira la referencia y el contador de IDs conserva su avance | Pendiente |
-| Intentar una operación con otra wallet | Una solicitud controlada con cuentas existentes se rechaza por autoridad | Pendiente |
-| Presentar una venta de otro cliente | Una solicitud controlada se rechaza por pertenencia | Pendiente |
-| Intentar la baja de un cliente con ventas activas | Se rechaza la baja y se conservan sus cuentas y referencias | Pendiente |
+| Crear Registro y Cliente | Las cuentas y su relación se pueden consultar en la app | Confirmado en Devnet con SCARIX y Ana · #1 |
+| Registrar y corregir una venta | Reproducir A01 y A04 con la wallet autorizada | Alta de SSD01 por 5,000 confirmada; corrección válida comprobada en prueba automatizada |
+| Procesar una devolución válida | La cuenta Venta se cierra y se actualiza Cliente | Confirmado en interfaz: Ana quedó sin ventas activas |
+| Dar de baja a un cliente sin ventas | Se cierra su cuenta, se retira la referencia y el contador de IDs conserva su avance | Confirmado en interfaz: Ana dejó de figurar; contador verificado en pruebas automatizadas |
+| Intentar una operación con otra wallet | Una solicitud controlada con cuentas existentes se rechaza por autoridad | Rechazo `NoOwner` comprobado en prueba automatizada Devnet |
+| Presentar una venta de otro cliente | Una solicitud controlada se rechaza por pertenencia | Rechazo `ConstraintSeeds` comprobado en prueba automatizada Devnet |
+| Intentar la baja de un cliente con ventas activas | Se rechaza la baja y se conservan sus cuentas y referencias | Rechazo `ClienteConVentas` comprobado en prueba automatizada Devnet |
 
 Al ejecutar cada caso, anotar el estado inicial, el resultado observado, cómo se comprobaron las cuentas y la firma o el error relevante. Adjuntar al menos una transacción válida de la versión entregada.
 
 ## Devnet y demo
 
-- **Program ID de Devnet:** pendiente de despliegue.
-- **Versión compilada y validada en CI:** `a7f364f296e86318e7296db57dcbae2ab5d9b5fb` (código de la ejecución); IDL y lockfiles sincronizados en `6c3e183366ba90f7fec719b54d2aa769f0ddf451`. Versión de Devnet pendiente.
-- **Transacción confirmada:** pendiente. Formato de enlace `https://explorer.solana.com/tx/<FIRMA>?cluster=devnet`.
+- **Program ID de Devnet:** `7qUUv2DpK2puFn91gkjwyfRyEDhcJV3enMEBi6oMHG3z`, desplegado y verificado.
+- **Versión compilada y validada en CI:** [ejecución final exitosa del 22 de noviembre](https://github.com/yoshiro-dev/registro_ventas_solana/actions/runs/45005312791); actualización del cliente Devnet en el commit `af89a48637116a07d6707429c5da1b653545f472`.
+- **Transacción confirmada de despliegue:** [ver firma en Explorer](https://explorer.solana.com/tx/5au2b15XJPGZ4s9vS6NUiBLZXkS5mzr9q41xjziku1t74XGZk2S7LYuNxZt5gJf1ixus7ZkyMKNw8gbn8qWLwXCE?cluster=devnet). [Otras 15 transacciones verificadas](evidencias/Prueba1795336274564.md).
 - **Video (60–90 s):** pendiente. Guion sugerido para 75 s: conectar wallet y mostrar el cliente (15 s), firmar y confirmar una venta válida (25 s), intentar una corrección superior al tope y mostrar el importe anterior (25 s), abrir la venta confirmada en Explorer (10 s). Si la interfaz filtra el importe antes de llamar al programa, mostrar también el error capturado por el cliente TypeScript.
 
 ## Cronograma técnico del 16 al 22 de noviembre
@@ -156,11 +156,11 @@ El plan empieza el lunes. Los primeros commits reales son del jueves 19. Los hit
 | --- | --- | --- |
 | Lunes 16 | Modelar Registro → Cliente → Venta. Identificar autoridad y semillas de cada PDA, y distinguir datos persistidos de argumentos de instrucción. | El código de referencia deriva Cliente del registro e ID y Venta del cliente y SKU. Ver los contextos Anchor en el archivo Rust. Revisión retrospectiva. |
 | Martes 17 | Especificar tres instrucciones afectadas: configurar, registrar y corregir. Definir límite inicial, límite inclusivo y comportamiento de ventas existentes. | Contrato descrito en Aporte propio y escenarios B01–B05. Documentación retrospectiva. |
-| Miércoles 18 | Diseñar las pruebas de frontera, aislamiento entre dos negocios y cierre condicionado de cliente. | Matrices A y B y pruebas del flujo guiado. Resultados en Devnet pendientes. |
-| Jueves 19 | Incorporar el campo persistido, la instrucción firmada de configuración, las dos validaciones de importe y la baja que retira la referencia y cierra Cliente. | Fuente Rust y dos pruebas unitarias escritas. Compilación y ejecución pendientes. |
-| Viernes 20 | Compilar y conectar Rust → IDL → cliente TypeScript → formularios de configuración, ventas y baja. | Compilación SBF, IDL generado y sincronizado, pruebas y build de React confirmados en GitHub Actions el 21 de noviembre, sin prueba de interacción con wallet. |
-| Sábado 21 | Ejecutar el flujo completo contra el despliegue de Devnet y comprobar estado antes y después de cada rechazo. | Program ID, firma exitosa, errores del programa y lecturas de cuentas en tablas A y B. Pendiente. |
-| Domingo 22 | Reproducir desde clon limpio, grabar demo de 60–90 segundos y entregar antes de las 23:59 CDMX. | Video, acceso de revisión y envío pendientes. |
+| Miércoles 18 | Diseñar las pruebas de frontera, aislamiento entre dos negocios y cierre condicionado de cliente. | Matrices A y B definidas; verificadas posteriormente en Devnet el 22 de noviembre. |
+| Jueves 19 | Incorporar el campo persistido, la instrucción firmada de configuración, las dos validaciones de importe y la baja que retira la referencia y cierra Cliente. | Fuente Rust y pruebas unitarias implementadas; compilación y ejecución confirmadas posteriormente. |
+| Viernes 20 | Compilar y conectar Rust → IDL → cliente TypeScript → formularios de configuración, ventas y baja. | Compilación SBF, IDL, pruebas y build confirmados; interacción real con Phantom verificada el 22 de noviembre. |
+| Sábado 21 | Preparar el flujo completo contra Devnet, el despliegue y la comparación antes/después de rechazos. | Flujo completado el domingo 22: 15 transacciones, 7 rechazos y evidencias verificables. |
+| Domingo 22 | Validar el programa en Devnet y completar pruebas manuales del frontend con Phantom. | Contrato, integración, compilación y recorrido manual completos; video y formulario externo no acreditados. |
 
 ### Pruebas adicionales de configuración por negocio
 
@@ -168,11 +168,11 @@ Usar dos registros A y B con autoridades distintas, ambos con el límite inicial
 
 | Caso | Acción | Resultado esperado | Observado |
 | --- | --- | --- | --- |
-| B01 | Conservar una venta de 8 000 en A. Su propietario cambia el tope a 5 000. | A guarda 5 000. La venta anterior sigue en 8 000. B conserva 10 000. | Pendiente |
-| B02 | En A registrar 5 000 y después intentar 5 001 con otro SKU. | Se confirma la primera y se rechaza la segunda. En B se admite 5 001. | Pendiente |
-| B03 | En A corregir la venta anterior a 5 001 y después a 5 000. | El rechazo conserva los 8 000. La corrección válida deja 5 000 en la misma cuenta. | Pendiente |
-| B04 | El propietario intenta configurar cero. | Error TopeInvalido. La nueva lectura muestra 5 000. | Pendiente |
-| B05 | La autoridad de B intenta cambiar el tope de A usando cuentas existentes. | Rechazo de autoridad. A y B conservan sus límites. | Pendiente |
+| B01 | Conservar una venta de 8 000 en A. Su propietario cambia el tope a 5 000. | A guarda 5 000. La venta anterior sigue en 8 000. B conserva 10 000. | Confirmado, `evidencias/Prueba1795336274564.md` |
+| B02 | En A registrar 5 000 y después intentar 5 001 con otro SKU. | Se confirma la primera y se rechaza la segunda. En B se admite 5 001. | Confirmado, `evidencias/Prueba1795336274564.md` |
+| B03 | En A corregir la venta anterior a 5 001 y después a 5 000. | El rechazo conserva los 8 000. La corrección válida deja 5 000 en la misma cuenta. | Rechazo y corrección válida comprobados en Devnet; ver informe automatizado |
+| B04 | El propietario intenta configurar cero. | Error TopeInvalido. La nueva lectura muestra 5 000. | `TopeInvalido` verificado en Devnet |
+| B05 | La autoridad de B intenta cambiar el tope de A usando cuentas existentes. | Rechazo de autoridad. A y B conservan sus límites. | `NoOwner` verificado en Devnet |
 
 ### Criterios de cierre del sábado 21
 
@@ -221,3 +221,15 @@ Registrar el nombre completo para el certificado y el correo usado en WayLearn a
 - `evidencias/Prueba1795336274564.md`
 
 Las pruebas fueron ejecutadas contra Devnet, no únicamente en un simulador local.
+
+## Pruebas manuales con Phantom — cierre del 22 de noviembre
+
+**Estado: recorrido funcional completado en Solana Devnet.** La aplicación React operó con una wallet Phantom conectada desde Brave. Se comprobó la creación de SCARIX (tope inicial 10,000), el alta de Ana, la venta `SSD01` por 5,000, la reducción del límite a 5,000, el intento de corrección a 5,001 **rechazado durante la simulación** y sin alterar el importe, la devolución de la venta y la baja de Ana.
+
+**Estado final:** negocio SCARIX existente, **límite 5,000**, **0 clientes activos** y **0 ventas activas**. La interfaz mostró confirmaciones y enlaces de Explorer en las operaciones aceptadas. El rechazo manual se observó como fallo de simulación de Phantom, sin código visible `MontoExcedeTope`; ese código se comprobó de manera independiente en los siete rechazos del conjunto automatizado.
+
+- [**Informe completo de las ocho pruebas manuales, entorno, resultados y limitaciones de evidencia**](docs/PRUEBAS_MANUALES_DEVNET_2026-11-22.md).
+- [Pruebas automatizadas de dos wallets (15 transacciones, 7 rechazos)](evidencias/Prueba1795336274564.md).
+- [Última compilación automática aprobada](https://github.com/yoshiro-dev/registro_ventas_solana/actions/runs/45005312791).
+
+**Alcance del cierre:** código, despliegue Devnet, pruebas de integración, frontend y documentación finalizados. **No se declara grabado un video de entrega ni enviado un formulario externo**, porque esas acciones no han sido acreditadas.
