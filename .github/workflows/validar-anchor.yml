@@ -38,7 +38,7 @@ jobs:
         run: |
           if [ ! -f Cargo.lock ]; then cargo generate-lockfile; fi
           cargo update -p blake3 --precise 1.8.2
-          cargo update -p proc-macro-crate --precise 3.2.0
+          cargo update -p proc-macro-crate@3.5.0 --precise 3.2.0
           cargo update -p indexmap --precise 2.11.4
           cargo update -p base64ct --precise 1.7.3
           sed -i 's/^version = 4$/version = 3/' Cargo.lock
