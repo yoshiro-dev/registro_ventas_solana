@@ -36,13 +36,16 @@ jobs:
       - name: Crear Cargo.lock reproducible para toolchain Solana 2.1
         shell: bash
         run: |
-          if [ ! -f Cargo.lock ]; then cargo generate-lockfile; fi
-          cargo update -p blake3 --precise 1.8.2
-          cargo update -p proc-macro-crate@3.5.0 --precise 3.2.0
-          cargo update -p indexmap --precise 2.11.4
-          cargo update -p zeroize --precise 1.8.2
-          cargo update -p unicode-segmentation --precise 1.12.0
-          sed -i 's/^version = 4$/version = 3/' Cargo.lock
+          if [ ! -f Cargo.lock ]; then
+            cargo generate-lockfile
+            cargo update -p blake3 --precise 1.8.2
+            cargo update -p proc-macro-crate@3.5.0 --precise 3.2.0
+            cargo update -p indexmap --precise 2.11.4
+            cargo update -p zeroize --precise 1.8.2
+            cargo update -p unicode-segmentation --precise 1.12.0
+            sed -i 's/^version = 4$/version = 3/' Cargo.lock
+          fi
+          test -s Cargo.lock
 
       - name: Validar dependencias con Cargo 1.79
         shell: bash
