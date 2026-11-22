@@ -33,14 +33,24 @@ jobs:
           node --version
           npm --version
 
-      - name: Compilar SBF con imagen oficial Anchor v0.31.1
+      - name: Crear Cargo.lock reproducible para toolchain Solana 2.1
+        shell: bash
+        run: |
+          if [ ! -f Cargo.lock ]; then cargo generate-lockfile; fi
+          cargo update -p blake3 --precise 1.8.2
+          cargo update -p indexmap --precise 2.11.4
+          cargo update -p base64ct --precise 1.7.3
+          sed -i 's/^version = 4$/version = 3/' Cargo.lock
+
+      - name: Compilar SBF e IDL con imagen oficial Anchor v0.31.1
         shell: bash
         run: |
           docker run --rm -v "$PWD:/workspace" -w /workspace solanafoundation/anchor:v0.31.1 \
-            bash -lc 'anchor --version && solana --version && anchor build'
+            bash -lc 'set -e; anchor --version; solana --version; cargo build-sbf --manifest-path programa/Cargo.toml; mkdir -p target/idl; anchor idl build -o target/idl/registro.json'
           test -s target/deploy/registro.so
           test -s target/idl/registro.json
-          echo "Confirmados binario SBF e IDL real."
+          echo "Confirmados binario SBF e IDL real sin modificar claves ni Program ID."
+          git diff --exit-code -- Anchor.toml programa/src/lib.rs
 
       - name: Ejecutar pruebas Rust
         shell: bash
