@@ -72,3 +72,58 @@ Las 15 transacciones y los 7 rechazos pertenecen al **recorrido automatizado de 
 **Validación funcional concluida:** el programa se desplegó en Devnet, las pruebas de integración automatizadas resultaron satisfactorias y la aplicación React ejecutó el flujo manual con Phantom, incluida la validación del límite, la devolución y la baja condicionada.
 
 **Alcance del cierre:** validación técnica del proyecto. Este documento no acredita un video grabado, una entrega externa a WayLearn ni un despliegue en Mainnet. Las claves privadas, frases de recuperación y keypairs quedan fuera del repositorio.
+
+## Anexo visual: capturas de las pruebas manuales
+
+Las siguientes imágenes corresponden a las pruebas realizadas
+con React, Phantom y Solana Devnet. Se recortaron para conservar
+la operación, los datos relevantes y el resultado observado.
+
+### M01_wallet_conectada_devnet
+
+![M01_wallet_conectada_devnet](../evidencias/capturas-manuales/M01_wallet_conectada_devnet.png)
+
+### M02_scarix_creado_10000
+
+![M02_scarix_creado_10000](../evidencias/capturas-manuales/M02_scarix_creado_10000.png)
+
+### M03_ana_cliente_1
+
+![M03_ana_cliente_1](../evidencias/capturas-manuales/M03_ana_cliente_1.png)
+
+### M03_transaccion_explorer_finalized
+
+![M03_transaccion_explorer_finalized](../evidencias/capturas-manuales/M03_transaccion_explorer_finalized.png)
+
+### M04_venta_ssd01_5000
+
+![M04_venta_ssd01_5000](../evidencias/capturas-manuales/M04_venta_ssd01_5000.png)
+
+### M05_limite_reducido_5000
+
+![M05_limite_reducido_5000](../evidencias/capturas-manuales/M05_limite_reducido_5000.png)
+
+### M06_correcion_5001_no_aplicada
+
+![M06_correcion_5001_no_aplicada](../evidencias/capturas-manuales/M06_correcion_5001_no_aplicada.png)
+
+### M06_rechazo_simulacion_phantom
+
+![M06_rechazo_simulacion_phantom](../evidencias/capturas-manuales/M06_rechazo_simulacion_phantom.png)
+
+### M07_phantom_devolucion_rent
+
+![M07_phantom_devolucion_rent](../evidencias/capturas-manuales/M07_phantom_devolucion_rent.png)
+
+### M07_venta_devuelta
+
+![M07_venta_devuelta](../evidencias/capturas-manuales/M07_venta_devuelta.png)
+
+### M08_cliente_dado_de_baja
+
+![M08_cliente_dado_de_baja](../evidencias/capturas-manuales/M08_cliente_dado_de_baja.png)
+
+### M08_phantom_baja_rent
+
+![M08_phantom_baja_rent](../evidencias/capturas-manuales/M08_phantom_baja_rent.png)
+
