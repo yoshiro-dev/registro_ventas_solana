@@ -1,0 +1,87 @@
+name: Compilar Anchor y verificar frontend
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: registro-solana-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    steps:
+      - name: Clonar proyecto
+        uses: actions/checkout@v4
+
+      - name: Instalar Anchor 0.31.1 y Solana 2.1.0
+        uses: metadaoproject/setup-anchor@v3.4
+        with:
+          anchor-version: '0.31.1'
+          solana-cli-version: '2.1.0'
+          node-version: '22.12.0'
+
+      - name: Registrar versiones
+        shell: bash
+        run: |
+          rustc --version
+          cargo --version
+          anchor --version
+          solana --version
+          node --version
+          npm --version
+
+      - name: Compilar programa SBF y generar IDL real
+        shell: bash
+        run: anchor build
+
+      - name: Ejecutar pruebas Rust
+        shell: bash
+        run: cargo test -p registro --lib
+
+      - name: Sincronizar IDL generado con frontend
+        shell: bash
+        run: node scripts/sync-idl.mjs
+
+      - name: Instalar dependencias web
+        shell: bash
+        run: npm install --no-audit --no-fund
+
+      - name: Ejecutar pruebas Node e integrar React
+        shell: bash
+        run: |
+          npm test
+          npm run build
+
+      - name: Conservar IDL, binario y salida web verificables
+        uses: actions/upload-artifact@v4
+        with:
+          name: registro-build-${{ github.sha }}
+          path: |
+            target/idl/registro.json
+            target/deploy/registro.so
+            app/src/idl.json
+            app/dist/
+            dist/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Publicar IDL compilado y lockfile en main
+        if: github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          git add app/src/idl.json package-lock.json
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "build: sincronizar IDL real y dependencias verificadas [skip ci]"
+            git push origin HEAD:main
+          else
+            echo "IDL y dependencias ya sincronizados."
+          fi
