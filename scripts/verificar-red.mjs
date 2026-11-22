@@ -91,7 +91,7 @@ assert.equal(final.idCounter,2);assert.ok(!final.clientes.some(k=>k.equals(clien
 record({caso:'Comprobación final',resultado:'Cuentas verificadas con dos negocios y dos wallets; bajas, rechazos y aislamiento comprobados'});
 evidence.estado='completada';
 evidence.finalizadoEn=new Date().toISOString();
-writeFileSync(path,JSON.stringify(evidence,null,2)+'\\n');
+writeFileSync(path,JSON.stringify(evidence,null,2)+'\n');
 const completed=evidence.casos.filter(x=>x.firma).length;
 const rejections=evidence.casos.filter(x=>x.error).length;
 const reportPath='evidencias/'+name+'.md';
@@ -110,6 +110,6 @@ writeFileSync(reportPath,[
   '| --- | --- |',
   ...evidence.casos.map(x=>'| '+x.caso+' | '+(x.url?'[Firma confirmada]('+x.url+')':x.error?'Rechazo \`'+x.error+'\`':x.resultado)+' |'),
   ''
-].join('\\n'));
+].join('\n'));
 console.log('Pruebas completas. Evidencia JSON: '+path);
 console.log('Informe con enlaces a Explorer: '+reportPath);
