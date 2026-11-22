@@ -41,6 +41,7 @@ jobs:
           cargo update -p proc-macro-crate@3.5.0 --precise 3.2.0
           cargo update -p indexmap --precise 2.11.4
           cargo update -p zeroize --precise 1.8.2
+          cargo update -p unicode-segmentation --precise 1.12.0
           sed -i 's/^version = 4$/version = 3/' Cargo.lock
 
       - name: Validar dependencias con Cargo 1.79
@@ -48,6 +49,7 @@ jobs:
         run: |
           rustup toolchain install 1.79.0 --profile minimal
           cargo +1.79.0 fetch --locked
+          cargo +1.79.0 check --locked -p registro --lib
 
       - name: Compilar SBF e IDL con imagen oficial Anchor v0.31.1
         shell: bash
