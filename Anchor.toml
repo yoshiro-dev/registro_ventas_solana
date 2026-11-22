@@ -1,0 +1,12 @@
+[toolchain]
+anchor_version = "0.31.1"
+
+[workspace]
+members = ["programa"]
+
+[programs.devnet]
+registro = "HShUvM3PBTXz7ncbF9rm6Qua4r7qM5oi3TkeaRMethgC"
+
+[provider]
+cluster = "Devnet"
+wallet = "~/.config/solana/id.json"

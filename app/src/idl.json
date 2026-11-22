@@ -1,0 +1,443 @@
+{
+  "address": "HShUvM3PBTXz7ncbF9rm6Qua4r7qM5oi3TkeaRMethgC",
+  "metadata": {
+    "name": "registro",
+    "version": "0.1.0",
+    "spec": "0.1.0"
+  },
+  "instructions": [
+    {
+      "name": "crear_registro",
+      "discriminator": [
+        93,
+        45,
+        68,
+        224,
+        227,
+        244,
+        209,
+        54
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "registro",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "nombre_negocio",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "configurar_tope",
+      "discriminator": [
+        1,
+        150,
+        132,
+        160,
+        96,
+        84,
+        32,
+        48
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "signer": true
+        },
+        {
+          "name": "registro",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "nuevo_tope",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "dar_baja_cliente",
+      "discriminator": [
+        108,
+        151,
+        48,
+        69,
+        85,
+        63,
+        36,
+        120
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "registro",
+          "writable": true
+        },
+        {
+          "name": "cliente",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "id_cliente",
+          "type": "u16"
+        }
+      ]
+    },
+    {
+      "name": "crear_cliente",
+      "discriminator": [
+        55,
+        98,
+        61,
+        156,
+        15,
+        134,
+        174,
+        95
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "registro",
+          "writable": true
+        },
+        {
+          "name": "cliente",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "nombre",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "registrar_venta",
+      "discriminator": [
+        47,
+        95,
+        122,
+        187,
+        82,
+        62,
+        119,
+        131
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "registro"
+        },
+        {
+          "name": "cliente",
+          "writable": true
+        },
+        {
+          "name": "venta",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "id_cliente",
+          "type": "u16"
+        },
+        {
+          "name": "sku",
+          "type": "string"
+        },
+        {
+          "name": "descripcion",
+          "type": "string"
+        },
+        {
+          "name": "monto",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "hacer_devolucion",
+      "discriminator": [
+        65,
+        193,
+        244,
+        124,
+        210,
+        201,
+        110,
+        191
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "registro"
+        },
+        {
+          "name": "cliente",
+          "writable": true
+        },
+        {
+          "name": "venta",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "id_cliente",
+          "type": "u16"
+        },
+        {
+          "name": "sku",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "cambiar_monto",
+      "discriminator": [
+        138,
+        26,
+        77,
+        29,
+        234,
+        177,
+        71,
+        94
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "signer": true
+        },
+        {
+          "name": "registro"
+        },
+        {
+          "name": "cliente"
+        },
+        {
+          "name": "venta",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "id_cliente",
+          "type": "u16"
+        },
+        {
+          "name": "sku",
+          "type": "string"
+        },
+        {
+          "name": "nuevo_monto",
+          "type": "u32"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Registro",
+      "discriminator": [
+        80,
+        44,
+        41,
+        67,
+        32,
+        150,
+        85,
+        243
+      ]
+    },
+    {
+      "name": "Cliente",
+      "discriminator": [
+        126,
+        253,
+        118,
+        23,
+        130,
+        179,
+        29,
+        228
+      ]
+    },
+    {
+      "name": "Venta",
+      "discriminator": [
+        46,
+        19,
+        228,
+        71,
+        14,
+        149,
+        86,
+        78
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "Registro",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "nombre_negocio",
+            "type": "string"
+          },
+          {
+            "name": "clientes",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "id_counter",
+            "type": "u16"
+          },
+          {
+            "name": "tope_por_venta",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Cliente",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id_cliente",
+            "type": "u16"
+          },
+          {
+            "name": "nombre",
+            "type": "string"
+          },
+          {
+            "name": "compras",
+            "type": "u16"
+          },
+          {
+            "name": "historial",
+            "type": {
+              "vec": "pubkey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Venta",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "sku",
+            "type": "string"
+          },
+          {
+            "name": "descripcion",
+            "type": "string"
+          },
+          {
+            "name": "monto",
+            "type": "u32"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "NoOwner",
+      "msg": "Error, no eres el owner del registro"
+    },
+    {
+      "code": 6001,
+      "name": "NoSKU",
+      "msg": "Error, la venta no esta en el historial del cliente"
+    },
+    {
+      "code": 6002,
+      "name": "MontoExcedeTope",
+      "msg": "El importe supera el límite vigente del negocio."
+    },
+    {
+      "code": 6003,
+      "name": "TopeInvalido",
+      "msg": "El límite debe ser mayor que cero."
+    },
+    {
+      "code": 6004,
+      "name": "ClienteConVentas",
+      "msg": "El cliente tiene ventas activas."
+    },
+    {
+      "code": 6005,
+      "name": "ClienteAjeno",
+      "msg": "El registro no contiene al cliente."
+    },
+    {
+      "code": 6006,
+      "name": "DatosInvalidos",
+      "msg": "Datos fuera del rango permitido."
+    },
+    {
+      "code": 6007,
+      "name": "CapacidadAgotada",
+      "msg": "Se alcanzó la capacidad disponible."
+    }
+  ]
+}

@@ -8,41 +8,30 @@
 
 Registro de negocio, clientes y ventas mediante una aplicación web con wallet y un programa Rust/Anchor en Solana Devnet. El aporte propuesto evita que una captura por encima del límite definido por el negocio se guarde como venta o como corrección de importe.
 
-**Estado actual.** El [programa Rust](programa/src/lib.rs) incorpora el tope configurable y la baja condicionada. El frontend y los parches de la etapa inicial solo contemplan el tope fijo. La integración, compilación, despliegue y pruebas de extremo a extremo están pendientes. Los siguientes apartados de auditoría describen el corte previo a la ampliación.
+## Probar ahora en Windows
 
-## Punto de partida
+Abrir **[Demo_local.html](Demo_local.html)** con Edge o Chrome. La práctica funciona sin Node, extensiones ni conexión. En SCARIX seleccionar **Crear negocio**, agregar un cliente, registrar el SKU SSD01 por 8 000 y cambiar el límite a 5 000. Intentar corregir SSD01 a 5 001. Consultar otra vez para ver el importe anterior y repetir con 5 000. Los datos de este modo se guardan en el navegador cuando su almacenamiento está disponible.
 
-### Revisión de cumplimiento al jueves 19 de noviembre
+## Estructura y estado
 
-| Criterio | Evidencia disponible | Qué falta para cerrar |
+| Pieza | Archivos | Verificación |
 | --- | --- | --- |
-| Ruta y aporte | Ruta 2, referencias fijadas y parches para alta y corrección | Ejecutar ambos caminos y comprobar el límite en el programa desplegado |
-| Código completo y acceso | Repositorio local con README, dos imágenes y dos parches | Incorporar fuentes Rust y frontend, baja de cliente del día 5, IDL y cliente TypeScript. Verificar que el equipo evaluador pueda abrir el repositorio |
-| Ejecución reproducible | Pasos de referencia para el frontend | Probar la versión integrada desde un clon limpio y registrar versiones y comandos efectivos |
-| Programa en Devnet | Red elegida | Publicar y comprobar el Program ID y cotejarlo con IDL y frontend |
-| Flujo y permisos | Matriz de pruebas más abajo | Registrar firma, confirmación, relectura de cuentas, permisos, pertenencia y cierre en los casos correspondientes |
-| Evidencia del aporte | Valores de prueba y error esperado definidos | Guardar al menos una transacción confirmada, el mensaje del rechazo y el estado observado antes y después |
-| Demo y entrega | Guion previsto de 75 segundos | Grabar, verificar acceso al video y al código, confirmar nombre y correo de inscripción y enviar el formulario |
+| Programa | `Anchor.toml`, `Cargo.toml`, [programa/src/lib.rs](programa/src/lib.rs) y manifiesto del crate | Siete instrucciones, firmas, PDA, cierres y validación de importes implementados. Compilación SBF pendiente en un equipo con la herramienta instalada |
+| App | `app/src/main.tsx`, `panel.mjs`, `style.css` y `devnet.ts` | React monta la interfaz. El cliente TypeScript deriva direcciones, construye instrucciones con Anchor, pide firma y relee cuentas después de confirmar. Build con dependencias y recorrido con una wallet pendientes |
+| Contrato | `app/src/idl.json` | IDL de referencia preparado desde el fuente. Sustituir por el IDL emitido por Anchor después de compilar |
+| Pruebas | `tests/`, pruebas unitarias en Rust y `scripts/verificar-red.mjs` | Cuatro pruebas Node ejecutadas. La comprobación de red usa dos wallets, valida rechazos y escribe evidencia de transacciones confirmadas |
+| Práctica local | `app/src/local.mjs` y `Demo_local.html` | Modelo en el navegador. Las transacciones y firmas para la certificación se obtienen en Devnet |
 
-### Metodología individual
+**Metodología individual.** Cada hito tiene una operación reproducible, un resultado esperado y un estado observado. Se registra el cambio en Git y se documenta la prueba con su entorno. La matriz de evidencias distingue la práctica local de la ejecución del programa desplegado.
 
-Una sola persona desarrolla, prueba y documenta el proyecto. Se propone un flujo Kanban personal con cuatro estados: pendiente, en curso, en verificación y terminado. Cada jornada empieza con un objetivo comprobable. Al cierre se anota qué cambió, qué prueba se ejecutó, el resultado observado, el enlace o commit y el bloqueo que pasa al día siguiente. Para una tarea de código, “terminado” exige la prueba correspondiente a su alcance.
-
-### Entorno de desarrollo
-
-| Componente | Situación al revisar |
-| --- | --- |
-| Equipo local | Windows y PowerShell. Git 2.56.1.windows.1, Node.js 26.7.0 y npm 11.19.0 detectados |
-| Frontend | React, Vite y TypeScript. Para reproducir el template, usar Node.js 22.12 o posterior de la rama 22. La versión local detectada queda fuera del intervalo declarado por el proyecto base |
-| Programa y cliente | Rust con Anchor. Entorno previsto para compilación y despliegue: Solana Playground. Cliente TypeScript generado con Codama a partir del IDL exportado |
-| Prueba de extremo a extremo | Navegador con wallet compatible, SOL de prueba y RPC Devnet. Usar una segunda wallet para comprobar autoridad. Registrar el Program ID público y las versiones utilizadas en la ejecución |
+### Punto de partida
 
 | Componente | Referencia de trabajo |
 | --- | --- |
 | Programa Rust/Anchor | [WayLearnLatam/Registro-Ventas-Solana-PDA, commit `1a414a8`](https://github.com/WayLearnLatam/Registro-Ventas-Solana-PDA/tree/1a414a889446934723d0c998a0a1977e79087dcb) |
 | Frontend React/TypeScript | [WayLearnLatam/Registro-Ventas-Solana-App, commit `baee514`](https://github.com/WayLearnLatam/Registro-Ventas-Solana-App/tree/baee5142f050e8fb92ccd4f910fe2cda44610e00) |
 
-Las referencias publicadas incluyen cinco operaciones. El flujo de baja condicionada de clientes del día 5 debe integrarse para completar la base de WayLearn. Consultar [Pruebas y evidencias](https://waylearn.gitbook.io/solana-engineering-track-advanced/pruebas-y-evidencias) para sus precondiciones.
+Las referencias publicadas incluyen cinco operaciones. El flujo de baja condicionada de clientes del día 5 está implementado en el programa y en la interfaz. Consultar [Pruebas y evidencias](https://waylearn.gitbook.io/solana-engineering-track-advanced/pruebas-y-evidencias) para sus precondiciones.
 
 ## Aporte propio
 
@@ -50,9 +39,49 @@ Cada negocio empieza con un tope de **10 000 unidades**. Su propietario puede mo
 
 El nuevo campo ocupa cuatro bytes. El despliegue de esta práctica utilizará un Program ID nuevo y registros nuevos. Una actualización de un despliegue anterior requeriría migrar las cuentas. La baja condicionada de clientes pertenece a la base guiada.
 
-## Configuración y ejecución prevista
+## Desarrollar y ejecutar
 
-Importar `programa/src/lib.rs` en Solana Playground y asignar el ID del nuevo programa a `declare_id!` antes de compilar. Desplegar en Devnet, exportar el IDL y, en el frontend de referencia con Node 22.12+ de la rama 22, ejecutar `npm ci`, `npm run configurar:idl -- ./tmp-idl/registro.json`, `npm run verificar` y `npm run dev`. Falta integrar el formulario para configurar el tope, su lectura y la baja de clientes, incorporar el cliente generado y verificar estos pasos desde un clon limpio. Los parches previos solo documentan la iteración inicial.
+Desde la raíz, usar Node.js 22.12 o posterior de la rama 22 con npm. Los comandos de práctica y pruebas Node también se pueden ejecutar desde PowerShell.
+
+```sh
+npm test
+node scripts/demo.mjs
+npm install
+npm run build
+npm run dev
+```
+
+Abrir la dirección local que muestra Vite. Para usar el modo de red, instalar una extensión compatible (Phantom o Solflare), seleccionar una cuenta de pruebas con SOL de Devnet y pulsar **Conectar wallet en Devnet**. La app usa el RPC de Devnet y comprueba que el programa sea ejecutable.
+
+### Compilar y desplegar el programa propio
+
+En Linux o WSL, usar Rust, Solana CLI con herramientas SBF compatibles y Anchor CLI 0.31.1. Se necesita una wallet de despliegue con SOL de prueba en la ruta indicada en Anchor.toml. La clave del programa y la de la wallet de despliegue son distintas. Conservar la clave del programa para futuras actualizaciones. Los archivos de claves quedan fuera de Git.
+
+```sh
+solana config set --url devnet
+solana balance
+npm run preparar
+anchor build
+cargo test -p registro --lib
+npm run idl
+anchor deploy --provider.cluster devnet
+npm run build
+npm run dev
+```
+
+`preparar` crea la clave de programa en `target/deploy/registro-keypair.json` si hace falta y sincroniza la dirección pública en Rust y Anchor.toml. Al finalizar `anchor build`, `npm run idl` copia el contrato generado a la app. La dirección inicial incluida en los fuentes es de desarrollo. Registrar el Program ID **efectivamente desplegado** y verificarlo en Explorer. Tras cualquier cambio del programa, recompilar y sincronizar el IDL antes de probar la app.
+
+### Verificación en Devnet
+
+Con dos wallets propias de prueba y saldo en Devnet, indicar las rutas locales de sus archivos de claves. Este recorrido crea negocios y clientes de prueba, modifica el límite, registra ventas y ejecuta devolución y baja. Las operaciones confirmadas consumen SOL de prueba.
+
+```sh
+export ANCHOR_WALLET="$HOME/.config/solana/id.json"
+export WALLET_B="/ruta/local/wallet-b.json"
+node scripts/verificar-red.mjs
+```
+
+El script guarda las firmas, enlaces y errores observados en `evidencias/Prueba*.json`. Un archivo parcial corresponde a un recorrido interrumpido. Solo el recorrido completo incluye el resultado final de verificación. Grabar después la demo de 60–90 segundos desde la interfaz y agregar el enlace de revisión.
 
 ## Pruebas del aporte
 

@@ -1,10 +1,11 @@
 use anchor_lang::prelude::*;
 
-declare_id!("");
+declare_id!("HShUvM3PBTXz7ncbF9rm6Qua4r7qM5oi3TkeaRMethgC");
 
 const TOPE_INICIAL: u32 = 10_000;
 
 fn validar_tope(monto: u32, limite: u32) -> Result<()> {
+    require!(monto > 0, Errores::DatosInvalidos);
     require!(monto <= limite, Errores::MontoExcedeTope);
     Ok(())
 }
@@ -16,6 +17,7 @@ pub mod registro {
     /////////////////////////// INSTRUCCIONES ///////////////////////////
     /////////////////////////// Crear Registro ///////////////////////////
     pub fn crear_registro(context: Context<NuevoRegistro>, nombre_negocio: String) -> Result<()> {
+        require!(!nombre_negocio.trim().is_empty() && nombre_negocio.len() <= 30, Errores::DatosInvalidos);
         context.accounts.registro.set_inner(Registro {
             owner: context.accounts.owner.key(),    // caller wallet
             nombre_negocio: nombre_negocio.clone(), // .clone() porque el String se reusa en el msg!
@@ -35,7 +37,7 @@ pub mod registro {
         Ok(())
     }
 
-    pub fn dar_baja_cliente(context: Context<BajaCliente>, _id_cliente: u16) -> Result<()> {
+    pub fn dar_baja_cliente(context: Context<BajaCliente>, id_cliente: u16) -> Result<()> {
         let cliente = &context.accounts.cliente;
         require!(cliente.historial.is_empty() && cliente.compras == 0, Errores::ClienteConVentas);
         let clientes = &mut context.accounts.registro.clientes;
@@ -49,13 +51,15 @@ pub mod registro {
     // "init" no puede ser condicional: Anchor crea las cuentas antes de entrar al handler.
     // Por eso el alta del cliente es su propia instruccion, separada de registrar_venta.
     pub fn crear_cliente(context: Context<NuevoCliente>, nombre: String) -> Result<()> {
+        require!(!nombre.trim().is_empty() && nombre.len() <= 30, Errores::DatosInvalidos);
+        require!(context.accounts.registro.clientes.len() < 10, Errores::CapacidadAgotada);
         let cliente_key = context.accounts.cliente.key(); // Se lee ANTES del &mut para no solapar prestamos
 
         let registro = &mut context.accounts.registro;
 
         // El id no es un argumento: lo asigna el programa. El contexto ya derivo la cuenta a
         // partir de este mismo valor, asi que aqui solo se confirma en el estado.
-        let id_cliente = registro.id_counter + 1;
+        let id_cliente = registro.id_counter.checked_add(1).ok_or(Errores::CapacidadAgotada)?;
         registro.id_counter = id_cliente;
         registro.clientes.push(cliente_key); // El registro guarda la PDA del cliente, no sus datos
 
@@ -76,11 +80,13 @@ pub mod registro {
     // las cuentas. Ver NuevaVenta.
     pub fn registrar_venta(
         context: Context<NuevaVenta>,
-        _id_cliente: u16,
+        id_cliente: u16,
         sku: String,
         descripcion: String,
         monto: u32,
     ) -> Result<()> {
+        require!(!sku.trim().is_empty() && sku.len() <= 5 && descripcion.len() <= 50, Errores::DatosInvalidos);
+        require!(context.accounts.cliente.historial.len() < 10, Errores::CapacidadAgotada);
         validar_tope(monto, context.accounts.registro.tope_por_venta)?;
 
         context.accounts.venta.set_inner(Venta {
@@ -109,7 +115,7 @@ pub mod registro {
     // y su rent vuelve al owner.
     pub fn hacer_devolucion(
         context: Context<EliminarVenta>,
-        _id_cliente: u16,
+        id_cliente: u16,
         sku: String,
     ) -> Result<()> {
         let venta_key = context.accounts.venta.key(); // Se lee ANTES del &mut de cliente
@@ -137,7 +143,7 @@ pub mod registro {
     // ni reconstruir la cadena a mano.
     pub fn cambiar_monto(
         context: Context<ModificarVenta>,
-        _id_cliente: u16,
+        id_cliente: u16,
         sku: String,
         nuevo_monto: u32,
     ) -> Result<()> {
@@ -173,6 +179,10 @@ pub enum Errores {
     ClienteConVentas,
     #[msg("El registro no contiene al cliente.")]
     ClienteAjeno,
+    #[msg("Datos fuera del rango permitido.")]
+    DatosInvalidos,
+    #[msg("Se alcanzó la capacidad disponible.")]
+    CapacidadAgotada,
 }
 
 /////////////////////////// CUENTAS ///////////////////////////
@@ -277,7 +287,7 @@ pub struct NuevoCliente<'info> {
         space = Cliente::INIT_SPACE + 8,
         // El id sale del contador del propio registro: el programa lo asigna, nadie lo envia.
         // to_le_bytes() porque un u16 no tiene as_bytes(): ese metodo es de String/str
-        seeds = [b"cliente", registro.key().as_ref(), (registro.id_counter + 1).to_le_bytes().as_ref()],
+        seeds = [b"cliente", registro.key().as_ref(), registro.id_counter.saturating_add(1).to_le_bytes().as_ref()],
         bump
     )]
     pub cliente: Account<'info, Cliente>,
