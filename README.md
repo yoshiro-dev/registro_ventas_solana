@@ -6,6 +6,15 @@
 
 **Solana Engineering Track: Advanced · Ruta 2: proyecto guiado con mejora funcional**
 
+### 🎬 Demostración en Solana Devnet
+
+[![Ver demostración en YouTube](https://img.youtube.com/vi/UDZgOdbseU0/hqdefault.jpg)](https://youtu.be/UDZgOdbseU0)
+
+**[▶ Ver demostración: Registro de Ventas en Solana (YouTube)](https://youtu.be/UDZgOdbseU0)**
+
+Video compartido para la entrega WayLearn. Presenta la interfaz React con Phantom, el registro de clientes y ventas, la validación del límite de 5,000/5,001 y la comprobación del programa en Solana Devnet. La [evidencia detallada de las ocho pruebas manuales](docs/PRUEBAS_MANUALES_DEVNET_2026-11-22.md) y las [capturas recortadas](evidencias/capturas-manuales/ANEXO_CAPTURAS.md) complementan el video.
+
+
 Registro de negocio, clientes y ventas mediante una aplicación web con wallet y un programa Rust/Anchor en Solana Devnet. El aporte propuesto evita que una captura por encima del límite definido por el negocio se guarde como venta o como corrección de importe.
 
 ## Probar ahora en Windows
@@ -146,7 +155,7 @@ Al ejecutar cada caso, anotar el estado inicial, el resultado observado, cómo s
 - **Program ID de Devnet:** `7qUUv2DpK2puFn91gkjwyfRyEDhcJV3enMEBi6oMHG3z`, desplegado y verificado.
 - **Versión compilada y validada en CI:** [ejecución final exitosa del 22 de noviembre](https://github.com/yoshiro-dev/registro_ventas_solana/actions/runs/45005312791); actualización del cliente Devnet en el commit `af89a48637116a07d6707429c5da1b653545f472`.
 - **Transacción confirmada de despliegue:** [ver firma en Explorer](https://explorer.solana.com/tx/5au2b15XJPGZ4s9vS6NUiBLZXkS5mzr9q41xjziku1t74XGZk2S7LYuNxZt5gJf1ixus7ZkyMKNw8gbn8qWLwXCE?cluster=devnet). [Otras 15 transacciones verificadas](evidencias/Prueba1795336274564.md).
-- **Video (60–90 s):** pendiente. Guion sugerido para 75 s: conectar wallet y mostrar el cliente (15 s), firmar y confirmar una venta válida (25 s), intentar una corrección superior al tope y mostrar el importe anterior (25 s), abrir la venta confirmada en Explorer (10 s). Si la interfaz filtra el importe antes de llamar al programa, mostrar también el error capturado por el cliente TypeScript.
+- **Video de demostración:** [publicado en YouTube](https://youtu.be/UDZgOdbseU0) y enlazado al inicio de este README; duración y contenido final a comprobar directamente en la plataforma.
 
 ## Cronograma técnico del 16 al 22 de noviembre
 
@@ -230,6 +239,6 @@ Las pruebas fueron ejecutadas contra Devnet, no únicamente en un simulador loca
 
 - [**Informe completo de las ocho pruebas manuales, entorno, resultados y limitaciones de evidencia**](docs/PRUEBAS_MANUALES_DEVNET_2026-11-22.md).
 - [Pruebas automatizadas de dos wallets (15 transacciones, 7 rechazos)](evidencias/Prueba1795336274564.md).
-- [Última compilación automática aprobada](https://github.com/yoshiro-dev/registro_ventas_solana/actions/runs/45005312791).
+- [Última compilación automática aprobada, con capturas integradas](https://github.com/yoshiro-dev/registro_ventas_solana/actions/runs/45007418853).
 
-**Alcance del cierre:** código, despliegue Devnet, pruebas de integración, frontend y documentación finalizados. **No se declara grabado un video de entrega ni enviado un formulario externo**, porque esas acciones no han sido acreditadas.
+**Alcance del cierre:** código, despliegue Devnet, pruebas de integración, frontend, documentación y enlace a la demostración publicados. **El envío del formulario externo de WayLearn todavía no está confirmado**; el enlace al video fue proporcionado por el autor.
