@@ -85,15 +85,25 @@ Al ejecutar cada caso, anotar el estado inicial, el resultado observado, cómo s
 
 El lunes 16 es el inicio de referencia para organizar el trabajo. Los estados indican lo comprobado al preparar este avance.
 
-| Fecha (CDMX) | Objetivo | Estado actual |
-| --- | --- | --- |
-| Lunes 16 | Definir la Ruta 2, el límite y los casos que demuestran el aporte. | Listo |
-| Martes 17 | Identificar y fijar las versiones de Rust y frontend. | Referencias fijadas. Cierre del día 5 por integrar |
-| Miércoles 18 | Preparar el README, el icono del proyecto y el favicon. | Listo |
-| Jueves 19 | Preparar la regla Rust, el aviso en el formulario y el enlace al favicon. | Parches preparados |
-| Viernes 20 | Integrar la baja guiada, compilar el programa y sincronizar IDL y cliente. | Pendiente |
-| Sábado 21 | Desplegar en Devnet y ejecutar los casos válidos y de rechazo. | Pendiente |
-| Domingo 22 | Verificar el README, grabar la demo y entregar antes de las 23:59 CDMX. | Pendiente |
+| Fecha (CDMX) | Avance esperado | Evidencia en el repositorio | Estado |
+| --- | --- | --- | --- |
+| Lunes 16 | Definir la Ruta 2 y la regla de importe. | Alcance y tabla de casos A01–A05 en el README. | Documentado |
+| Martes 17 | Fijar las versiones de Rust y del frontend. | Enlaces a los commits de WayLearn en Punto de partida. | Referencias registradas |
+| Miércoles 18 | Preparar la identidad del proyecto. | Icono en el README y favicon en `app/public/`. | Incorporado |
+| Jueves 19 | Preparar la implementación del tope y el aviso del frontend. | Parches en `patches/` y comprobación de que aplican a sus bases. | Parches verificados |
+| Viernes 20 | Integrar la baja guiada y el tope. Compilar y preparar el despliegue. | Commit de integración y resultado de compilación. Registrar el IDL generado y comprobar que el cliente se puede regenerar. | Pendiente |
+| Sábado 21 | Probar la app conectada al programa en Devnet y cerrar la versión de entrega. | Commit de la versión candidata con Program ID, IDL y cliente sincronizados, enlace de Explorer y resultados de las pruebas. | Pendiente |
+| Domingo 22 | Ensayar, grabar y enviar la entrega antes de las 23:59 CDMX. | Enlace de la demo de 60 a 90 segundos en el README y comprobación del acceso de revisión. | Pendiente |
+
+Actualizar el estado de cada hito cuando exista evidencia comprobada. La fecha del hito expresa el plan de la semana. El historial de Git conserva la fecha real del trabajo.
+
+### Criterios de cierre del sábado 21
+
+- La app abre en local, conecta una wallet y opera contra el Program ID de Devnet que figura en el README. Ese mismo ID aparece en los artefactos de la versión candidata.
+- Desde la app, crear Registro y Cliente, confirmar una venta por **10 000** y guardar su firma con un enlace a Solana Explorer.
+- Ejecutar el registro y la corrección por **10 001** con cuentas válidas. Documentar `MontoExcedeTope` y comprobar que la venta rechazada no se crea y que la corrección rechazada conserva el importe anterior.
+- Completar los casos guiados de corrección válida, devolución, baja de cliente vacío y rechazos por ventas activas, wallet sin autorización y venta de otro cliente. Registrar en el README los resultados observados y la evidencia correspondiente.
+- Dejar listo el recorrido de la demo con datos de prueba. Si una prueba funcional sigue pendiente, registrarla como pendiente y resolverla antes de enviar.
 
 La fecha del **30 de noviembre a las 23:59 CDMX** corresponde a correcciones solicitadas sobre proyectos enviados en el plazo inicial.
 
