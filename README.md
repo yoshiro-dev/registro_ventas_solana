@@ -84,6 +84,23 @@ npm run dev
 
 `preparar` crea la clave de programa en `target/deploy/registro-keypair.json` si hace falta y sincroniza la dirección pública en Rust y Anchor.toml. Al finalizar `anchor build`, `npm run idl` copia el contrato generado a la app. La dirección inicial incluida en los fuentes es de desarrollo. Registrar el Program ID **efectivamente desplegado** y verificarlo en Explorer. Tras cualquier cambio del programa, recompilar y sincronizar el IDL antes de probar la app.
 
+### Desplegar y verificar desde WSL con un solo comando
+
+Se agregó [`scripts/desplegar-devnet.sh`](scripts/desplegar-devnet.sh), que utiliza **Anchor CLI 0.31.1**, Solana CLI, Node 22 y las claves **locales** del usuario. El script crea o reutiliza `target/deploy/registro-keypair.json`, sincroniza ese Program ID en Rust y `Anchor.toml`, compila, genera el IDL real, valida el frontend, despliega y comprueba que el programa sea ejecutable en Devnet.
+
+Desde la raíz del repositorio en WSL/Linux, **con dos wallets distintas de prueba ya financiadas con SOL de Devnet**, ejecutar:
+
+```bash
+git pull origin main
+export ANCHOR_WALLET="$HOME/.config/solana/id.json"
+export WALLET_B="$HOME/.config/solana/wallet-b.json"
+bash scripts/desplegar-devnet.sh
+```
+
+Si `WALLET_B` no está definida, el script puede desplegar, pero **no** ejecutará las pruebas de dos wallets. Para crear wallets nuevas en el equipo se puede usar `solana-keygen new --outfile ...`, evitando reemplazar wallets existentes; consultar su dirección con `solana-keygen pubkey /ruta/wallet.json` y obtener exclusivamente SOL de **Devnet** mediante el faucet de pruebas. Nunca pegar secretos ni archivos JSON de claves en el chat o en GitHub.
+
+Después de una prueba completa, se generarán `evidencias/Prueba*.json` y `evidencias/Prueba*.md`, con firmas, errores observados y enlaces de Solana Explorer. Estos informes son válidos **solo cuando** indican `estado: completada`; un JSON parcial indica una prueba incompleta. Actualizar entonces el README con el Program ID observado, el SHA de la versión desplegada y una firma confirmada, y guardar en Git los cambios de `Anchor.toml`, `programa/src/lib.rs`, `app/src/idl.json` y la evidencia. **No subir** `target/deploy/registro-keypair.json` ni claves de las wallets.
+
 ### Verificación en Devnet
 
 Con dos wallets propias de prueba y saldo en Devnet, indicar las rutas locales de sus archivos de claves. Este recorrido crea negocios y clientes de prueba, modifica el límite, registra ventas y ejecuta devolución y baja. Las operaciones confirmadas consumen SOL de prueba.
