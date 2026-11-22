@@ -5,7 +5,9 @@ const {AnchorProvider,Program,Wallet,web3}=anchor;
 const {PublicKey,Keypair,SystemProgram,Connection,clusterApiUrl}=web3;
 const loadKey=path=>Keypair.fromSecretKey(Uint8Array.from(JSON.parse(readFileSync(path,'utf8'))));
 if(!process.env.ANCHOR_WALLET || !process.env.WALLET_B) throw Error('Define ANCHOR_WALLET y WALLET_B con rutas de dos wallets de prueba con SOL de Devnet.');
-const conn=new Connection(clusterApiUrl('devnet'),'confirmed');
+const rpcUrl=process.env.SOLANA_RPC_URL || clusterApiUrl('devnet');
+if (!/^https:\/\//.test(rpcUrl)) throw Error('SOLANA_RPC_URL debe ser una URL HTTPS de un RPC de Devnet.');
+const conn=new Connection(rpcUrl,'confirmed');
 const idl=JSON.parse(readFileSync('app/src/idl.json','utf8'));
 const clients=[process.env.ANCHOR_WALLET,process.env.WALLET_B].map(path=>{
   const payer=loadKey(path);
@@ -29,14 +31,58 @@ const evidence={programId:a.programId.toBase58(),negocio:name,cluster:'devnet',c
 mkdirSync('evidencias',{recursive:true});
 const path='evidencias/'+name+'.json';
 const record=(row)=>{evidence.casos.push(row);writeFileSync(path,JSON.stringify(evidence,null,2));};
-async function send(label,ix){const firma=await ix.rpc();record({caso:label,firma,url:'https://explorer.solana.com/tx/'+firma+'?cluster=devnet'});}
-async function reject(label,ix,code){
-  try {await ix.simulate();}catch(e){
-    const actual=e.error?.errorCode?.code;
-    assert.equal(actual,code,String(e));
-    record({caso:label,error:actual});return;
+// Los errores de simulación pueden venir como AnchorError estructurado o como
+// texto/logs de Solana. Nunca confundir un fallo RPC 429 con un rechazo de negocio.
+const pausaMs=Number(process.env.PAUSA_RPC_MS ?? 1200);
+if(!Number.isFinite(pausaMs)||pausaMs<0)throw Error('PAUSA_RPC_MS debe ser un número no negativo.');
+const pausa=()=>new Promise(resolve=>setTimeout(resolve,pausaMs));
+const eLogs=e=>[e?.logs,e?.transactionLogs,e?.simulationResponse?.logs,e?.error?.logs]
+  .filter(Array.isArray).flat().join('\n');
+function codigoRechazo(e){
+  const estructurado=e?.error?.errorCode?.code ?? e?.errorCode?.code ?? e?.error?.error?.errorCode?.code;
+  if(estructurado)return estructurado;
+  const texto=String(e?.message??e)+'\n'+eLogs(e);
+  const anchorCode=texto.match(/Error Code:\s*([A-Za-z][A-Za-z0-9_]*)/i);
+  if(anchorCode)return anchorCode[1];
+  const custom=texto.match(/custom program error:\s*0x([0-9a-f]+)/i);
+  if(custom){
+    const numero=parseInt(custom[1],16);
+    if(numero===2006)return 'ConstraintSeeds';
+    return idl.errors?.find(item=>item.code===numero)?.name;
   }
-  throw Error('Se esperaba rechazo: '+label);
+  return undefined;
+}
+function errorRpc(e){
+  const texto=String(e?.message??e);
+  return /429|Too Many Requests|rate limit/i.test(texto);
+}
+async function send(label,ix){
+  await pausa();
+  let firma;
+  try{firma=await ix.rpc();}catch(e){
+    if(errorRpc(e))throw Error('RPC de Devnet respondió 429 al enviar '+label+'. No repetir sin comprobar el estado en la red; una transacción podría haberse confirmado. Configura SOLANA_RPC_URL con otro endpoint Devnet.');
+    throw e;
+  }
+  record({caso:label,firma,url:'https://explorer.solana.com/tx/'+firma+'?cluster=devnet'});
+  console.log('OK '+label+': '+firma);
+}
+async function reject(label,ix,esperado){
+  await pausa();
+  try{await ix.simulate();}catch(e){
+    if(errorRpc(e))throw Error('RPC de Devnet respondió 429 durante '+label+'. Prueba inconclusa, NO es un rechazo del contrato. Usa SOLANA_RPC_URL con un endpoint Devnet alternativo.');
+    const actual=codigoRechazo(e);
+    if(actual===undefined){
+      console.error('Error sin código Anchor durante '+label+': '+String(e?.message??e));
+      const logs=eLogs(e);
+      if(logs)console.error('Logs de simulación:\n'+logs);
+      throw Error('No se pudo identificar un error Anchor durante '+label+'; prueba inconclusa. Revisa el mensaje y los logs anteriores.',{cause:e});
+    }
+    assert.equal(actual,esperado,'Error inesperado en '+label+': '+String(e?.message??e));
+    record({caso:label,error:actual});
+    console.log('Rechazo esperado '+label+': '+actual);
+    return;
+  }
+  throw Error('Se esperaba rechazo y la simulación tuvo éxito: '+label);
 }
 const programAccount=await conn.getAccountInfo(a.programId);
 assert.ok(programAccount?.executable,'Despliega primero el Program ID del IDL en Devnet.');
