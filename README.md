@@ -194,3 +194,30 @@ La fecha del **30 de noviembre a las 23:59 CDMX** corresponde a correcciones sol
 - [Formulario de entrega](https://airtable.com/appqcPkgPHDB6fyz7/pagtEQg4DjDOKDHIL)
 
 Registrar el nombre completo para el certificado y el correo usado en WayLearn al completar el formulario de entrega.
+
+## Despliegue verificado en Solana Devnet
+
+**Fecha:** 22 de noviembre de 2026.
+
+**Program ID:**
+`7qUUv2DpK2puFn91gkjwyfRyEDhcJV3enMEBi6oMHG3z`
+
+[Consultar programa en Solana Explorer](https://explorer.solana.com/address/7qUUv2DpK2puFn91gkjwyfRyEDhcJV3enMEBi6oMHG3z?cluster=devnet)
+
+[Transacción de despliegue](https://explorer.solana.com/tx/5au2b15XJPGZ4s9vS6NUiBLZXkS5mzr9q41xjziku1t74XGZk2S7LYuNxZt5gJf1ixus7ZkyMKNw8gbn8qWLwXCE?cluster=devnet)
+
+### Resultados de integración
+
+- 15 transacciones confirmadas.
+- 7 rechazos esperados correctamente identificados.
+- Dos negocios independientes y dos wallets.
+- Límite inicial de 10,000 y actualización a 5,000.
+- Validación de la frontera 5,000/5,001.
+- Conservación de ventas históricas.
+- Devoluciones y baja condicionada de clientes.
+
+**Evidencias:**
+- `evidencias/Prueba1795336274564.json`
+- `evidencias/Prueba1795336274564.md`
+
+Las pruebas fueron ejecutadas contra Devnet, no únicamente en un simulador local.

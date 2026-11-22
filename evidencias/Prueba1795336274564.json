@@ -1,0 +1,127 @@
+{
+  "programId": "7qUUv2DpK2puFn91gkjwyfRyEDhcJV3enMEBi6oMHG3z",
+  "negocio": "Prueba1795336274564",
+  "cluster": "devnet",
+  "casos": [
+    {
+      "caso": "Crear negocio A",
+      "firma": "5hBUsePYDSchueB5w6FGiGEazqZSgFLmRnvda9t5mYqsvrBH3BRjTikLFqzXrhjESFf34EWU9KvUd37vx6BZ76nu",
+      "url": "https://explorer.solana.com/tx/5hBUsePYDSchueB5w6FGiGEazqZSgFLmRnvda9t5mYqsvrBH3BRjTikLFqzXrhjESFf34EWU9KvUd37vx6BZ76nu?cluster=devnet"
+    },
+    {
+      "caso": "Crear negocio B",
+      "firma": "53UdhcjcvrT7RTuXVMRxTU5BKPnskUWUsvp2Bh6rB83uJwAKY8WGcY1p5mySQAediFvSqGqj8RYXKbQ7kHLGFYUG",
+      "url": "https://explorer.solana.com/tx/53UdhcjcvrT7RTuXVMRxTU5BKPnskUWUsvp2Bh6rB83uJwAKY8WGcY1p5mySQAediFvSqGqj8RYXKbQ7kHLGFYUG?cluster=devnet"
+    },
+    {
+      "caso": "Crear cliente",
+      "firma": "61TZqwBQhNBBR6XpAqfFrb5MXHBY8bdJJAD3hVjdmZFmEA8Ppd4pgC8viwpfRyNmNGFrtUGB8LjnbiSWn15X9sXT",
+      "url": "https://explorer.solana.com/tx/61TZqwBQhNBBR6XpAqfFrb5MXHBY8bdJJAD3hVjdmZFmEA8Ppd4pgC8viwpfRyNmNGFrtUGB8LjnbiSWn15X9sXT?cluster=devnet"
+    },
+    {
+      "caso": "Crear otro cliente",
+      "firma": "5WHejHi95HawBphUrtrgWMF9wCn1JeffA4VkgHp8uARzySmgCDCwQiGswHUQANdtgwGThWQ5z426T687sgu15LC4",
+      "url": "https://explorer.solana.com/tx/5WHejHi95HawBphUrtrgWMF9wCn1JeffA4VkgHp8uARzySmgCDCwQiGswHUQANdtgwGThWQ5z426T687sgu15LC4?cluster=devnet"
+    },
+    {
+      "caso": "Crear cliente B",
+      "firma": "2Py8SGw4uNpzS4aUqrysMCGHoj3Y77hfHPHL52KkNzfJ6wcLUTxdSY2t3sinZVvNPXtkbNFHFeeQy1HZ8Ky8jFmL",
+      "url": "https://explorer.solana.com/tx/2Py8SGw4uNpzS4aUqrysMCGHoj3Y77hfHPHL52KkNzfJ6wcLUTxdSY2t3sinZVvNPXtkbNFHFeeQy1HZ8Ky8jFmL?cluster=devnet"
+    },
+    {
+      "caso": "Venta en límite inicial de 10000",
+      "firma": "3HFAXjc7JcYGbgqocLeiKTUTNUvi1pz55BxUBHmhwmXHTV8dCYivEmuJPHvXWAT2smfrRQw3VTyKWu4MG31uwtvc",
+      "url": "https://explorer.solana.com/tx/3HFAXjc7JcYGbgqocLeiKTUTNUvi1pz55BxUBHmhwmXHTV8dCYivEmuJPHvXWAT2smfrRQw3VTyKWu4MG31uwtvc?cluster=devnet"
+    },
+    {
+      "caso": "Venta histórica por 8000",
+      "firma": "5MLz5TqpNjqb4zEmDQbE96awdMicVuCBWqAMx2efMu2kRvTaz1nHXh7FLbuocovcFvNHeHoAzTkfHEt8mR19X8XF",
+      "url": "https://explorer.solana.com/tx/5MLz5TqpNjqb4zEmDQbE96awdMicVuCBWqAMx2efMu2kRvTaz1nHXh7FLbuocovcFvNHeHoAzTkfHEt8mR19X8XF?cluster=devnet"
+    },
+    {
+      "caso": "Cambiar límite A a 5000",
+      "firma": "3WbtdReWxehPfLfjZAXFLdxNodMNypHscHuGvkK2VhJ7x3sjQq66L9Wma7u9G3UrrmFxFCL11R4odMdSeLPmNuHC",
+      "url": "https://explorer.solana.com/tx/3WbtdReWxehPfLfjZAXFLdxNodMNypHscHuGvkK2VhJ7x3sjQq66L9Wma7u9G3UrrmFxFCL11R4odMdSeLPmNuHC?cluster=devnet"
+    },
+    {
+      "caso": "B01 conservar ventas antiguas y aislar límites",
+      "resultado": "A=5000, B=10000; ventas previas=10000 y 8000"
+    },
+    {
+      "caso": "Negocio B admite 5001",
+      "firma": "4TVnZpcyXzQv7ifwb57wjm4tVPXjc6N41Zd4iY2wgen8tDn3xgQW1F8RxqbgkiBwgWFeXetTTcUWg6PwESxu8aJG",
+      "url": "https://explorer.solana.com/tx/4TVnZpcyXzQv7ifwb57wjm4tVPXjc6N41Zd4iY2wgen8tDn3xgQW1F8RxqbgkiBwgWFeXetTTcUWg6PwESxu8aJG?cluster=devnet"
+    },
+    {
+      "caso": "Alta en frontera 5000 en A",
+      "firma": "2TEB4ADGDRK2edx849ny8Bt1jKdZy8sNsGPVgFR4fNLojiPGjC9SCASCVcJxEDQ596eQiRnQgpggt79V3ByExFvc",
+      "url": "https://explorer.solana.com/tx/2TEB4ADGDRK2edx849ny8Bt1jKdZy8sNsGPVgFR4fNLojiPGjC9SCASCVcJxEDQ596eQiRnQgpggt79V3ByExFvc?cluster=devnet"
+    },
+    {
+      "caso": "Corrección 5000 a 5001 se rechaza",
+      "error": "MontoExcedeTope"
+    },
+    {
+      "caso": "B02-B03 frontera 5000/5001",
+      "resultado": "Venta 5000 confirmada, corrección 5001 rechazada; cuenta conserva 5000"
+    },
+    {
+      "caso": "Wallet ajena",
+      "error": "NoOwner"
+    },
+    {
+      "caso": "Límite cero",
+      "error": "TopeInvalido"
+    },
+    {
+      "caso": "Alta sobre tope",
+      "error": "MontoExcedeTope"
+    },
+    {
+      "caso": "Corrección sobre tope",
+      "error": "MontoExcedeTope"
+    },
+    {
+      "caso": "Venta ajena",
+      "error": "ConstraintSeeds"
+    },
+    {
+      "caso": "Corrección válida",
+      "firma": "4q4y76aFDTd9oNz2uJXEJescaFdwxNPBcxCQwCQw81FXDPuK3KQjgeBv3rDSkMHJU1ggrpfJzTH9bMmFFHvKXsYD",
+      "url": "https://explorer.solana.com/tx/4q4y76aFDTd9oNz2uJXEJescaFdwxNPBcxCQwCQw81FXDPuK3KQjgeBv3rDSkMHJU1ggrpfJzTH9bMmFFHvKXsYD?cluster=devnet"
+    },
+    {
+      "caso": "Baja con ventas",
+      "error": "ClienteConVentas"
+    },
+    {
+      "caso": "Devolución de venta inicial",
+      "firma": "35YsMmN1uWVGByTnUx8zGsVYG7dcH6GTeAaUcyzMkh7xY5fDtwvxb5kDgQuWURUnbTfcgyYDKYgu6EfyQHoiaMre",
+      "url": "https://explorer.solana.com/tx/35YsMmN1uWVGByTnUx8zGsVYG7dcH6GTeAaUcyzMkh7xY5fDtwvxb5kDgQuWURUnbTfcgyYDKYgu6EfyQHoiaMre?cluster=devnet"
+    },
+    {
+      "caso": "Devolución de venta histórica",
+      "firma": "5TASDmNs1NdykWjC6gi3VcRAB8emJEavLASFoPUVALikicri5kTVEvvkJibjvcwxVcMXcG376zN2pU9nWn6Qc1hp",
+      "url": "https://explorer.solana.com/tx/5TASDmNs1NdykWjC6gi3VcRAB8emJEavLASFoPUVALikicri5kTVEvvkJibjvcwxVcMXcG376zN2pU9nWn6Qc1hp?cluster=devnet"
+    },
+    {
+      "caso": "Devolución de venta en frontera",
+      "firma": "3YakYKwpio3PHRnYxEXYuH824wPki1DvZppGtRjaBLfba661tyrQc3n2v7KDnMXouPReT1Gr5isZYj4BhLMvkEkq",
+      "url": "https://explorer.solana.com/tx/3YakYKwpio3PHRnYxEXYuH824wPki1DvZppGtRjaBLfba661tyrQc3n2v7KDnMXouPReT1Gr5isZYj4BhLMvkEkq?cluster=devnet"
+    },
+    {
+      "caso": "Baja de cliente vacío",
+      "firma": "4J6U1KH8WCAiJgTVNYSUfjCY726PtDj95pQyyGDGbvaTShNLjZCcPRLgZDsaR9tdTZyzuchYVBnS7ajjuead7qFA",
+      "url": "https://explorer.solana.com/tx/4J6U1KH8WCAiJgTVNYSUfjCY726PtDj95pQyyGDGbvaTShNLjZCcPRLgZDsaR9tdTZyzuchYVBnS7ajjuead7qFA?cluster=devnet"
+    },
+    {
+      "caso": "Comprobación final",
+      "resultado": "Cuentas verificadas con dos negocios y dos wallets; bajas, rechazos y aislamiento comprobados"
+    }
+  ],
+  "ejecucion": "real",
+  "estado": "completada",
+  "walletA": "AVm4fvCeMcimQd6gmMPN6GSPAXkJzGkNpQ2gCUmkxW8G",
+  "walletB": "7V4aBgrtEeddU3RyqUmdUamJj1CxyPu8MjXsHbbgoyzF",
+  "finalizadoEn": "2026-11-22T08:32:49.824Z"
+}
