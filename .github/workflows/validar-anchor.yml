@@ -27,6 +27,14 @@ jobs:
           solana-cli-version: '2.1.0'
           node-version: '22.12.0'
 
+      - name: Reparar permisos del binario de Anchor instalado
+        shell: bash
+        run: |
+          anchor_binary="$(npm root -g)/@coral-xyz/anchor-cli/anchor"
+          test -f "$anchor_binary"
+          chmod +x "$anchor_binary"
+          anchor --version | grep -F "anchor-cli 0.31.1"
+
       - name: Registrar versiones
         shell: bash
         run: |
@@ -39,7 +47,11 @@ jobs:
 
       - name: Compilar programa SBF y generar IDL real
         shell: bash
-        run: anchor build
+        run: |
+          anchor build
+          test -s target/deploy/registro.so
+          test -s target/idl/registro.json
+          echo "Confirmados binario SBF e IDL generado."
 
       - name: Ejecutar pruebas Rust
         shell: bash
