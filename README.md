@@ -8,7 +8,7 @@
 
 Registro de negocio, clientes y ventas mediante una aplicación web con wallet y un programa Rust/Anchor en Solana Devnet. El aporte propuesto evita que una captura por encima del límite definido por el negocio se guarde como venta o como corrección de importe.
 
-**Estado:** alcance definido, iconos incorporados al repositorio y primeros cambios de Rust y frontend preparados como parches. Integración del cierre guiado, compilación, pruebas en Devnet y demo pendientes.
+**Estado actual.** El [programa Rust](programa/src/lib.rs) incorpora el tope configurable y la baja condicionada. El frontend y los parches de la etapa inicial solo contemplan el tope fijo. La integración, compilación, despliegue y pruebas de extremo a extremo están pendientes. Los siguientes apartados de auditoría describen el corte previo a la ampliación.
 
 ## Punto de partida
 
@@ -46,30 +46,13 @@ Las referencias publicadas incluyen cinco operaciones. El flujo de baja condicio
 
 ## Aporte propio
 
-Agregar un límite fijo e inclusivo de **10 000 unidades** por venta. Si el monto supera el límite al registrar una venta o corregir una existente, el programa devuelve un error de negocio. La base representa los importes como enteros `u32`, así que `10_000` en Rust corresponde a 10 000 en el formulario.
+Cada negocio empieza con un tope de **10 000 unidades**. Su propietario puede modificarlo mediante `configurar_tope`. El programa exige la firma de la autoridad y un valor positivo. Las altas y correcciones leen el tope vigente desde la cuenta Registro. Cambiarlo afecta escrituras futuras y conserva el importe de las ventas existentes. Las devoluciones siguen disponibles.
 
-| Capa | Trabajo previsto |
-| --- | --- |
-| Programa Rust/Anchor | Reutilizar la misma validación en registro y corrección, después de las comprobaciones de cuentas y antes de actualizar datos. Conservar la validación base del importe y agregar el error `MontoExcedeTope` al final del enum para preservar los códigos existentes. La regla usa una constante y el esquema de cuentas actual. |
-| IDL y cliente TypeScript | Regenerar con el flujo del template e integrar el error del programa en el manejo de errores del cliente. Verificar que el IDL y el cliente apunten al Program ID entregado. |
-| Frontend | Mostrar el tope en los formularios y traducir el rechazo del programa a «El importe supera el máximo permitido de 10 000». Tras una operación confirmada, volver a consultar los datos y mostrar el enlace de la transacción. |
+El nuevo campo ocupa cuatro bytes. El despliegue de esta práctica utilizará un Program ID nuevo y registros nuevos. Una actualización de un despliegue anterior requeriría migrar las cuentas. La baja condicionada de clientes pertenece a la base guiada.
 
-## Configuración y ejecución
+## Configuración y ejecución prevista
 
-### Integración del avance
-
-- En la raíz de la copia del programa, aplicar [programa-tope.patch](patches/programa-tope.patch). El parche agrega la regla a `registrar_venta` y `cambiar_monto`.
-- En la raíz de la copia del frontend, aplicar [frontend-tope-e-icono.patch](patches/frontend-tope-e-icono.patch) y copiar [favicon.png](app/public/favicon.png) a `public/favicon.png`. El formulario informa el límite y deja que el programa devuelva el rechazo. El manejador de errores de la base consulta el IDL para traducir errores personalizados.
-- Aplicar cada parche con `git apply /ruta/al/parche.patch` desde la copia correspondiente. Si el cierre del día 5 usa otra revisión, verificar compatibilidad con `git apply --check /ruta/al/parche.patch`.
-- El frontend de referencia documenta Node.js 22.12 o superior de la rama 22, `npm ci`, `npm run cliente` y `npm run dev`. Tras exportar el IDL del despliegue, el comando de importación es `npm run configurar:idl -- ./tmp-idl/registro.json`. Verificar estos pasos sobre la versión integrada.
-
-Completar esta sección con los datos de la versión base y verificarla desde un clon limpio.
-
-1. Documentar las versiones verificadas de Node.js y las herramientas usadas para compilar y desplegar el programa.
-2. Indicar las rutas del programa, el frontend, el IDL y el cliente, así como los comandos exactos para instalar dependencias, compilar, regenerar cliente y arrancar el frontend.
-3. Explicar cómo configurar Devnet y el Program ID en el frontend, con ejemplos de variables o archivos si corresponden.
-4. Abrir la URL local, conectar una wallet compatible con SOL de prueba y crear un registro y un cliente de demostración.
-5. Ejecutar el recorrido siguiente. Usar el script `npm run verificar` si está disponible en la versión elegida y añadir las comprobaciones del programa y el recorrido en Devnet.
+Importar `programa/src/lib.rs` en Solana Playground y asignar el ID del nuevo programa a `declare_id!` antes de compilar. Desplegar en Devnet, exportar el IDL y, en el frontend de referencia con Node 22.12+ de la rama 22, ejecutar `npm ci`, `npm run configurar:idl -- ./tmp-idl/registro.json`, `npm run verificar` y `npm run dev`. Falta integrar el formulario para configurar el tope, su lectura y la baja de clientes, incorporar el cliente generado y verificar estos pasos desde un clon limpio. Los parches previos solo documentan la iteración inicial.
 
 ## Pruebas del aporte
 
@@ -106,32 +89,35 @@ Al ejecutar cada caso, anotar el estado inicial, el resultado observado, cómo s
 - **Transacción confirmada:** pendiente. Formato de enlace `https://explorer.solana.com/tx/<FIRMA>?cluster=devnet`.
 - **Video (60–90 s):** pendiente. Guion sugerido para 75 s: conectar wallet y mostrar el cliente (15 s), firmar y confirmar una venta válida (25 s), intentar una corrección superior al tope y mostrar el importe anterior (25 s), abrir la venta confirmada en Explorer (10 s). Si la interfaz filtra el importe antes de llamar al programa, mostrar también el error capturado por el cliente TypeScript.
 
-## Avance de la semana del 16 al 22 de noviembre
+## Cronograma técnico del 16 al 22 de noviembre
 
-El lunes 16 es el inicio de referencia para organizar el trabajo. Los estados indican lo comprobado al preparar este avance.
+El plan empieza el lunes. Los primeros commits reales son del jueves 19. Los hitos anteriores representan una reconstrucción del trabajo y su evidencia disponible.
 
-**Bitácora retrospectiva.** Los tres commits de avance previos a esta revisión están fechados el jueves 19. Los hitos del lunes, martes y miércoles se reconstruyen a partir de esos archivos. El historial disponible acredita cuándo quedaron registrados.
+| Jornada | Resultado técnico concreto | Comprobación y estado |
+| --- | --- | --- |
+| Lunes 16 | Modelar Registro → Cliente → Venta. Identificar autoridad y semillas de cada PDA, y distinguir datos persistidos de argumentos de instrucción. | El código de referencia deriva Cliente del registro e ID y Venta del cliente y SKU. Ver los contextos Anchor en el archivo Rust. Revisión retrospectiva. |
+| Martes 17 | Especificar tres instrucciones afectadas: configurar, registrar y corregir. Definir límite inicial, límite inclusivo y comportamiento de ventas existentes. | Contrato descrito en Aporte propio y escenarios B01–B05. Documentación retrospectiva. |
+| Miércoles 18 | Diseñar las pruebas de frontera, aislamiento entre dos negocios y cierre condicionado de cliente. | Matrices A y B y pruebas del flujo guiado. Resultados en Devnet pendientes. |
+| Jueves 19 | Incorporar el campo persistido, la instrucción firmada de configuración, las dos validaciones de importe y la baja que retira la referencia y cierra Cliente. | Fuente Rust y dos pruebas unitarias escritas. Compilación y ejecución pendientes. |
+| Viernes 20 | Compilar y conectar Rust → IDL → cliente TypeScript → formularios de configuración, ventas y baja. | Cerrar con compilación, generación de cliente, lectura del límite desde la app y verificación del frontend. Pendiente. |
+| Sábado 21 | Ejecutar el flujo completo contra el despliegue de Devnet y comprobar estado antes y después de cada rechazo. | Program ID, firma exitosa, errores del programa y lecturas de cuentas en tablas A y B. Pendiente. |
+| Domingo 22 | Reproducir desde clon limpio, grabar demo de 60–90 segundos y entregar antes de las 23:59 CDMX. | Video, acceso de revisión y envío pendientes. |
 
-| Jornada planificada | Resultado disponible | Evidencia y fecha efectiva | Pendiente al cierre del hito |
+### Pruebas adicionales de configuración por negocio
+
+Usar dos registros A y B con autoridades distintas, ambos con el límite inicial. Ejecutar A01–A05 con el límite inicial antes de esta secuencia.
+
+| Caso | Acción | Resultado esperado | Observado |
 | --- | --- | --- | --- |
-| Lunes 16 · alcance | Regla para registrar y corregir ventas y cinco escenarios de aceptación | README inicial, `217aa64` del 19 | Ejecutar los escenarios |
-| Martes 17 · análisis | Versiones de referencia del programa y de la app identificadas | Enlaces con SHA, `ac9f673` del 19 | Completar la baja del día 5 |
-| Miércoles 18 · documentación e identidad | README, icono del recibo y favicon | Archivos incorporados en `ac9f673` del 19 | Ver el favicon en la app integrada |
-| Jueves 19 · desarrollo | Parches de alta y corrección y aviso en el formulario. Se comprobó su aplicación a la base | `ac9f673` y criterios de cierre en `998ef84`, ambos del 19 | Compilar, regenerar el cliente y probar contra Devnet |
-
-| Fecha (CDMX) | Avance esperado | Evidencia en el repositorio | Estado |
-| --- | --- | --- | --- |
-| Lunes 16 | Definir la Ruta 2 y la regla de importe. | Alcance y tabla de casos A01–A05 en el README. | Documentado |
-| Martes 17 | Fijar las versiones de Rust y del frontend. | Enlaces a los commits de WayLearn en Punto de partida. | Referencias registradas |
-| Miércoles 18 | Preparar la identidad del proyecto. | Icono en el README y favicon en `app/public/`. | Incorporado |
-| Jueves 19 | Preparar la implementación del tope y el aviso del frontend. | Parches en `patches/` y comprobación de que aplican a sus bases. | Parches verificados |
-| Viernes 20 | Integrar la baja guiada y el tope. Compilar y preparar el despliegue. | Commit de integración y resultado de compilación. Registrar el IDL generado y comprobar que el cliente se puede regenerar. | Pendiente |
-| Sábado 21 | Probar la app conectada al programa en Devnet y cerrar la versión de entrega. | Commit de la versión candidata con Program ID, IDL y cliente sincronizados, enlace de Explorer y resultados de las pruebas. | Pendiente |
-| Domingo 22 | Ensayar, grabar y enviar la entrega antes de las 23:59 CDMX. | Enlace de la demo de 60 a 90 segundos en el README y comprobación del acceso de revisión. | Pendiente |
-
-Actualizar el estado de cada hito cuando exista evidencia comprobada. La fecha del hito expresa el plan de la semana. El historial de Git conserva la fecha real del trabajo.
+| B01 | Conservar una venta de 8 000 en A. Su propietario cambia el tope a 5 000. | A guarda 5 000. La venta anterior sigue en 8 000. B conserva 10 000. | Pendiente |
+| B02 | En A registrar 5 000 y después intentar 5 001 con otro SKU. | Se confirma la primera y se rechaza la segunda. En B se admite 5 001. | Pendiente |
+| B03 | En A corregir la venta anterior a 5 001 y después a 5 000. | El rechazo conserva los 8 000. La corrección válida deja 5 000 en la misma cuenta. | Pendiente |
+| B04 | El propietario intenta configurar cero. | Error TopeInvalido. La nueva lectura muestra 5 000. | Pendiente |
+| B05 | La autoridad de B intenta cambiar el tope de A usando cuentas existentes. | Rechazo de autoridad. A y B conservan sus límites. | Pendiente |
 
 ### Criterios de cierre del sábado 21
+
+Ejecutar también B01–B05 y mostrar en la demo el cambio firmado del límite y una venta rechazada bajo la nueva política.
 
 - La app abre en local, conecta una wallet y opera contra el Program ID de Devnet que figura en el README. Ese mismo ID aparece en los artefactos de la versión candidata.
 - Desde la app, crear Registro y Cliente, confirmar una venta por **10 000** y guardar su firma con un enlace a Solana Explorer.
