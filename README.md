@@ -115,15 +115,15 @@ El script guarda las firmas, enlaces y errores observados en `evidencias/Prueba*
 
 ## Pruebas del aporte
 
-Usar clientes ficticios, una wallet autorizada y cuentas válidas. El primer importe entero por encima del tope es **10 001**.
+Esta matriz conserva los **escenarios originalmente diseñados** con el límite inicial de 10,000 (primer importe superior: **10,001**). El recorrido final ejecutó operaciones equivalentes en Devnet y comprobó la frontera **5,000/5,001** después de modificar el tope. Se distingue lo ejecutado realmente de los valores exactos que no se probaron.
 
 | Caso | Operación | Resultado esperado | Resultado observado |
 | --- | --- | --- | --- |
-| A01 | Registrar una venta por 2 500 | Se crea la venta y el cliente refleja el cambio | Pendiente |
-| A02 | Registrar una venta por 10 000 | El programa acepta exactamente el máximo | Pendiente |
-| A03 | Registrar una venta por el mínimo superior a 10 000 | `MontoExcedeTope`. La cuenta de venta sigue sin existir y las referencias y contadores conservan su valor previo | Pendiente |
-| A04 | Corregir la venta de 2 500 a 3 000 | La misma venta queda en 3 000 y conserva su relación con el cliente | Pendiente |
-| A05 | Corregir esa venta por encima de 10 000 | `MontoExcedeTope`. La venta conserva 3 000 y el estado del cliente queda igual | Pendiente |
+| A01 | Registrar una venta por 2 500 | Se crea la venta y el cliente refleja el cambio | **Cobertura equivalente:** ventas 5,000 (manual) y 10,000 (automatizada); 2,500 exactos no ejecutados |
+| A02 | Registrar una venta por 10 000 | El programa acepta exactamente el máximo | **Confirmado en Devnet:** venta de 10,000 antes de reducir el límite |
+| A03 | Registrar una venta por el mínimo superior a 10 000 | `MontoExcedeTope`. La cuenta de venta sigue sin existir y las referencias y contadores conservan su valor previo | **Cobertura equivalente:** rechazo de 5,001 contra 5,000 en pruebas reales; 10,001 exactos no ejecutados |
+| A04 | Corregir la venta de 2 500 a 3 000 | La misma venta queda en 3 000 y conserva su relación con el cliente | **Cobertura equivalente:** corrección válida en pruebas automatizadas; importes exactos no ejecutados |
+| A05 | Corregir esa venta por encima de 10 000 | `MontoExcedeTope`. La venta conserva 3 000 y el estado del cliente queda igual | **Cobertura equivalente:** 5,000 → 5,001 rechazada y monto conservado; 10,001 exactos no ejecutados |
 
 Si el formulario bloquea un importe antes de enviarlo, reproducir A03 y A05 con el cliente TypeScript para comprobar que la regla también se ejecuta en Rust. Guardar el error y comparar las cuentas antes y después. Un rechazo en la simulación previa puede dejar un mensaje de error sin firma pública.
 
