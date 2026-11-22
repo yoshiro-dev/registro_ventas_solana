@@ -25,6 +25,14 @@ jobs:
         with:
           node-version: '22.12.0'
 
+      - name: Verificar sintaxis de scripts de despliegue y Devnet
+        shell: bash
+        run: |
+          bash -n scripts/desplegar-devnet.sh
+          node --check scripts/verificar-red.mjs
+          node --check scripts/preparar.mjs
+          node --check scripts/sync-idl.mjs
+
       - name: Registrar versiones del host
         shell: bash
         run: |
