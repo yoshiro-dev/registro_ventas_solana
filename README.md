@@ -12,6 +12,31 @@ Registro de negocio, clientes y ventas mediante una aplicación web con wallet y
 
 ## Punto de partida
 
+### Revisión de cumplimiento al jueves 19 de noviembre
+
+| Criterio | Evidencia disponible | Qué falta para cerrar |
+| --- | --- | --- |
+| Ruta y aporte | Ruta 2, referencias fijadas y parches para alta y corrección | Ejecutar ambos caminos y comprobar el límite en el programa desplegado |
+| Código completo y acceso | Repositorio local con README, dos imágenes y dos parches | Incorporar fuentes Rust y frontend, baja de cliente del día 5, IDL y cliente TypeScript. Verificar que el equipo evaluador pueda abrir el repositorio |
+| Ejecución reproducible | Pasos de referencia para el frontend | Probar la versión integrada desde un clon limpio y registrar versiones y comandos efectivos |
+| Programa en Devnet | Red elegida | Publicar y comprobar el Program ID y cotejarlo con IDL y frontend |
+| Flujo y permisos | Matriz de pruebas más abajo | Registrar firma, confirmación, relectura de cuentas, permisos, pertenencia y cierre en los casos correspondientes |
+| Evidencia del aporte | Valores de prueba y error esperado definidos | Guardar al menos una transacción confirmada, el mensaje del rechazo y el estado observado antes y después |
+| Demo y entrega | Guion previsto de 75 segundos | Grabar, verificar acceso al video y al código, confirmar nombre y correo de inscripción y enviar el formulario |
+
+### Metodología individual
+
+Una sola persona desarrolla, prueba y documenta el proyecto. Se propone un flujo Kanban personal con cuatro estados: pendiente, en curso, en verificación y terminado. Cada jornada empieza con un objetivo comprobable. Al cierre se anota qué cambió, qué prueba se ejecutó, el resultado observado, el enlace o commit y el bloqueo que pasa al día siguiente. Para una tarea de código, “terminado” exige la prueba correspondiente a su alcance.
+
+### Entorno de desarrollo
+
+| Componente | Situación al revisar |
+| --- | --- |
+| Equipo local | Windows y PowerShell. Git 2.56.1.windows.1, Node.js 26.7.0 y npm 11.19.0 detectados |
+| Frontend | React, Vite y TypeScript. Para reproducir el template, usar Node.js 22.12 o posterior de la rama 22. La versión local detectada queda fuera del intervalo declarado por el proyecto base |
+| Programa y cliente | Rust con Anchor. Entorno previsto para compilación y despliegue: Solana Playground. Cliente TypeScript generado con Codama a partir del IDL exportado |
+| Prueba de extremo a extremo | Navegador con wallet compatible, SOL de prueba y RPC Devnet. Usar una segunda wallet para comprobar autoridad. Registrar el Program ID público y las versiones utilizadas en la ejecución |
+
 | Componente | Referencia de trabajo |
 | --- | --- |
 | Programa Rust/Anchor | [WayLearnLatam/Registro-Ventas-Solana-PDA, commit `1a414a8`](https://github.com/WayLearnLatam/Registro-Ventas-Solana-PDA/tree/1a414a889446934723d0c998a0a1977e79087dcb) |
@@ -84,6 +109,15 @@ Al ejecutar cada caso, anotar el estado inicial, el resultado observado, cómo s
 ## Avance de la semana del 16 al 22 de noviembre
 
 El lunes 16 es el inicio de referencia para organizar el trabajo. Los estados indican lo comprobado al preparar este avance.
+
+**Bitácora retrospectiva.** Los tres commits de avance previos a esta revisión están fechados el jueves 19. Los hitos del lunes, martes y miércoles se reconstruyen a partir de esos archivos. El historial disponible acredita cuándo quedaron registrados.
+
+| Jornada planificada | Resultado disponible | Evidencia y fecha efectiva | Pendiente al cierre del hito |
+| --- | --- | --- | --- |
+| Lunes 16 · alcance | Regla para registrar y corregir ventas y cinco escenarios de aceptación | README inicial, `217aa64` del 19 | Ejecutar los escenarios |
+| Martes 17 · análisis | Versiones de referencia del programa y de la app identificadas | Enlaces con SHA, `ac9f673` del 19 | Completar la baja del día 5 |
+| Miércoles 18 · documentación e identidad | README, icono del recibo y favicon | Archivos incorporados en `ac9f673` del 19 | Ver el favicon en la app integrada |
+| Jueves 19 · desarrollo | Parches de alta y corrección y aviso en el formulario. Se comprobó su aplicación a la base | `ac9f673` y criterios de cierre en `998ef84`, ambos del 19 | Compilar, regenerar el cliente y probar contra Devnet |
 
 | Fecha (CDMX) | Avance esperado | Evidencia en el repositorio | Estado |
 | --- | --- | --- | --- |
