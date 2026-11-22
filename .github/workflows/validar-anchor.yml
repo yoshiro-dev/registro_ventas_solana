@@ -20,38 +20,27 @@ jobs:
       - name: Clonar proyecto
         uses: actions/checkout@v4
 
-      - name: Instalar Anchor 0.31.1 y Solana 2.1.0
-        uses: metadaoproject/setup-anchor@v3.4
+      - name: Preparar Node.js 22
+        uses: actions/setup-node@v4
         with:
-          anchor-version: '0.31.1'
-          solana-cli-version: '2.1.0'
           node-version: '22.12.0'
 
-      - name: Reparar permisos del binario de Anchor instalado
-        shell: bash
-        run: |
-          anchor_binary="$(npm root -g)/@coral-xyz/anchor-cli/anchor"
-          test -f "$anchor_binary"
-          chmod +x "$anchor_binary"
-          anchor --version | grep -F "anchor-cli 0.31.1"
-
-      - name: Registrar versiones
+      - name: Registrar versiones del host
         shell: bash
         run: |
           rustc --version
           cargo --version
-          anchor --version
-          solana --version
           node --version
           npm --version
 
-      - name: Compilar programa SBF y generar IDL real
+      - name: Compilar SBF con imagen oficial Anchor v0.31.1
         shell: bash
         run: |
-          anchor build
+          docker run --rm -v "$PWD:/workspace" -w /workspace solanafoundation/anchor:v0.31.1 \
+            bash -lc 'anchor --version && solana --version && anchor build'
           test -s target/deploy/registro.so
           test -s target/idl/registro.json
-          echo "Confirmados binario SBF e IDL generado."
+          echo "Confirmados binario SBF e IDL real."
 
       - name: Ejecutar pruebas Rust
         shell: bash
@@ -88,7 +77,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         shell: bash
         run: |
-          git add app/src/idl.json package-lock.json
+          git add app/src/idl.json package-lock.json Cargo.lock
           if ! git diff --cached --quiet; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
